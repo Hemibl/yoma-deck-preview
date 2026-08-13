@@ -31,6 +31,7 @@ body{font-family:Deck,'Assistant','Heebo',Arial,sans-serif;color:var(--ink);-web
 #stage{width:1280px;height:720px;position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%) scale(var(--fit,1));transform-origin:center center;
   box-shadow:0 30px 90px rgba(0,0,0,.5)}
+@media (hover:none) and (pointer:coarse){#stage{box-shadow:none}}
 .slide{position:absolute;inset:0;background:var(--bg);opacity:0;pointer-events:none;
   transition:opacity .45s ease,transform .45s ease;transform:translateY(14px);overflow:hidden}
 .slide.on{opacity:1;pointer-events:auto;transform:none}
@@ -467,6 +468,13 @@ b,strong{font-weight:600;color:var(--ink)}
 .tapz{position:fixed;top:0;bottom:0;width:26%;z-index:19;display:none;
   align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .tapz.next{left:0}.tapz.prev{right:0}
+#fsbtn{position:fixed;top:calc(10px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));
+  z-index:22;display:none;align-items:center;gap:7px;background:rgba(255,255,255,.13);
+  color:rgba(255,255,255,.82);border:none;border-radius:3px;padding:8px 13px;font-size:12px;
+  font-family:inherit;letter-spacing:.04em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#fsbtn svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
+@media (hover:none) and (pointer:coarse){#fsbtn{display:flex}}
+:fullscreen #fsbtn{display:none}
 .tapz b{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.10);
   color:rgba(255,255,255,.55);font-size:15px;line-height:34px;text-align:center;font-weight:400;
   opacity:0;transition:opacity .3s ease}
@@ -1141,6 +1149,7 @@ b,strong{font-weight:600;color:var(--ink)}
 
 </div></div>
 
+<button id="fsbtn"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v3m0 8v3a2 2 0 002 2h3m8 0h3a2 2 0 002-2v-3m0-8V5a2 2 0 00-2-2h-3"/></svg>מסך מלא</button>
 <div class="tapz prev" aria-label="הקודם"><b>›</b></div>
 <div class="tapz next" aria-label="הבא"><b>‹</b></div>
 <div id="chrome"><div id="bar"></div><span id="cnt"></span></div>
@@ -1152,7 +1161,7 @@ function fit(){
   var vv=window.visualViewport,
       w=vv?vv.width:innerWidth, h=vv?vv.height:innerHeight;
   document.documentElement.style.setProperty('--vph', h+'px');
-  stage.style.setProperty('--fit', Math.min(w/1280,h/720)*0.965);
+  stage.style.setProperty('--fit', Math.min(w/1280,h/720));
 }
 function go(n){i=Math.max(0,Math.min(slides.length-1,n));
   slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
@@ -1203,6 +1212,17 @@ addEventListener('keydown',function(e){
       go(dx<0 ? i+1 : i-1);           /* RTL: drag leftwards moves forward */
     }
   },{passive:true});
+  var fsb=document.getElementById('fsbtn');
+  fsb.addEventListener('click',function(e){
+    e.stopPropagation();
+    var el=document.documentElement;
+    var req=el.requestFullscreen||el.webkitRequestFullscreen;
+    if(req) Promise.resolve(req.call(el)).then(function(){
+      if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){});
+      setTimeout(fit,220);
+    }).catch(function(){});
+  });
+  document.addEventListener('fullscreenchange',function(){setTimeout(fit,220)});
   var zn=document.querySelector('.tapz.next'), zp=document.querySelector('.tapz.prev');
   zn.addEventListener('click',function(){go(i+1)});
   zp.addEventListener('click',function(){go(i-1)});
