@@ -27,9 +27,9 @@
 html,body{height:100%;background:#0E1720;overflow:hidden}
 body{font-family:Deck,'Assistant','Heebo',Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
 
-#viewport{position:fixed;top:0;left:0;right:0;bottom:0;height:100vh;height:100dvh;
-  display:grid;place-items:center;overflow:hidden}
-#stage{width:1280px;height:720px;position:relative;transform-origin:center center;
+#viewport{position:fixed;top:0;left:0;width:100%;height:var(--vph,100vh);overflow:hidden}
+#stage{width:1280px;height:720px;position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--fit,1));transform-origin:center center;
   box-shadow:0 30px 90px rgba(0,0,0,.5)}
 .slide{position:absolute;inset:0;background:var(--bg);opacity:0;pointer-events:none;
   transition:opacity .45s ease,transform .45s ease;transform:translateY(14px);overflow:hidden}
@@ -520,7 +520,7 @@ b,strong{font-weight:600;color:var(--ink)}
   @page{size:1280px 720px;margin:0}
   html,body{overflow:visible;background:#fff;height:auto}
   #viewport{position:static;display:block}
-  #stage{transform:none!important;box-shadow:none;width:1280px;height:auto}
+  #stage{position:relative;top:auto;left:auto;transform:none!important;box-shadow:none;width:1280px;height:auto}
   .slide{position:relative;opacity:1!important;transform:none!important;height:720px;
     break-after:page;page-break-after:always;pointer-events:auto;
     -webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -1137,9 +1137,9 @@ var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,
     stage=document.getElementById('stage'),bar=document.getElementById('bar'),cnt=document.getElementById('cnt');
 function fit(){
   var vv=window.visualViewport,
-      w=vv?vv.width:innerWidth, h=vv?vv.height:innerHeight,
-      s=Math.min(w/1280,h/720)*0.965;
-  stage.style.transform='scale('+s+')';
+      w=vv?vv.width:innerWidth, h=vv?vv.height:innerHeight;
+  document.documentElement.style.setProperty('--vph', h+'px');
+  stage.style.setProperty('--fit', Math.min(w/1280,h/720)*0.965);
 }
 function go(n){i=Math.max(0,Math.min(slides.length-1,n));
   slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
