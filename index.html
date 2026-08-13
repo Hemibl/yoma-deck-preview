@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<title>יומא אדריכלים · כל מה שקורה מסביב לשרטוט</title>
+<style>
+@font-face{font-family:Deck;src:url(assets/fonts/rubik-hebrew.woff2) format('woff2');
+  font-weight:300 700;font-display:swap;
+  unicode-range:U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+@font-face{font-family:Deck;src:url(assets/fonts/rubik-latin.woff2) format('woff2');
+  font-weight:300 700;font-display:swap}
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  /* palette sampled from YOMA's own material:
+     dusk navy from the Givat Ye'arim photograph, Jerusalem stone from Ben Maimon,
+     corten accent from their own written material palette */
+  --base:#1A2129; --base-deep:#11171C;
+  --tint:#EDEFEF;
+  --accent:#1A2129; --accent-tint:#EDEFEF;
+  --bg:#F7F8F8;
+  --ink:#14171A; --muted:#6C7378; --line:#E4E7E8;
+  --coral:#C65136;            /* cover + thanks only */
+}
+html,body{height:100%;background:#0E1720;overflow:hidden}
+body{font-family:Deck,'Assistant','Heebo',Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+
+#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;
+  box-shadow:0 30px 90px rgba(0,0,0,.5)}
+.slide{position:absolute;inset:0;background:var(--bg);opacity:0;pointer-events:none;
+  transition:opacity .45s ease,transform .45s ease;transform:translateY(14px);overflow:hidden}
+.slide.on{opacity:1;pointer-events:auto;transform:none}
+.pad{position:absolute;inset:0;padding:56px 74px;display:flex;flex-direction:column}
+.slide:not(.cover)::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(to right,rgba(20,23,26,.05) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(20,23,26,.05) 1px,transparent 1px),
+    linear-gradient(to right,rgba(20,23,26,.022) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(20,23,26,.022) 1px,transparent 1px);
+  background-size:296px 296px,296px 296px,37px 37px,37px 37px;
+  background-position:74px 74px,74px 74px,74px 74px,74px 74px}
+.slide.dark:not(.cover)::before{background-image:
+    linear-gradient(to right,rgba(255,255,255,.05) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(255,255,255,.05) 1px,transparent 1px),
+    linear-gradient(to right,rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(255,255,255,.022) 1px,transparent 1px)}
+.pad{z-index:1}
+.slide::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* type */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;color:#9AA2A7;
+  margin-bottom:18px;display:flex;align-items:center;gap:11px}
+.eyebrow .num{color:#B6BDC1;font-size:11px;letter-spacing:.14em;padding:0;background:none;
+  border-left:1px solid var(--line);padding-left:11px}
+.dark .eyebrow .num{background:none;color:#69747A;border-left-color:rgba(255,255,255,.14)}
+h1{font-size:58px;font-weight:700;line-height:1.08;letter-spacing:-.015em}
+h2{font-size:38px;font-weight:700;line-height:1.16;letter-spacing:-.012em;color:var(--base)}
+h3{font-size:19px;font-weight:600;line-height:1.3;color:var(--base)}
+.lead{font-size:18.5px;line-height:1.58;color:var(--muted);margin-top:13px;max-width:70ch}
+.kicker{font-size:16px;line-height:1.6;color:var(--muted)}
+.foot{margin-top:auto;font-size:17px;line-height:1.5;color:var(--base);font-weight:500;
+  border-top:1px solid var(--line);padding-top:18px}
+b,strong{font-weight:600;color:var(--ink)}
+.mono{font-variant-numeric:tabular-nums}
+
+/* dark */
+.dark{background:var(--base);color:#EDF1F4}
+.dark h2,.dark h3{color:#fff}
+.dark .lead,.dark .kicker{color:#AFC0CD}
+.dark .foot{color:#DCE5EC;border-top-color:rgba(255,255,255,.18)}
+.dark .eyebrow{color:#9BA6AC;letter-spacing:.18em}
+
+.dark b,.dark strong{color:#fff}
+.dark .card{background:rgba(255,255,255,.07)}
+.dark .card p,.dark .card .cp{color:#AFC0CD}
+.dark .card h3{color:#fff}
+.dark .pill.ghost{color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28)}
+.dark .ic{stroke:#9BA6AC;opacity:.95}
+
+/* components */
+.card{background:#fff;border-radius:3px;padding:22px 24px;box-shadow:0 0 0 1px var(--line)}
+.trio>.card{min-height:212px}
+.card .cp{font-size:14.5px;line-height:1.55;color:var(--muted);margin-top:7px}
+.card.tint{background:var(--accent-tint)}
+.card.gt{background:var(--tint)}
+.pill{display:inline-block;background:var(--base);color:#fff;border-radius:999px;padding:6px 15px;font-size:13.5px;font-weight:500}
+.pill.ghost{background:transparent;color:var(--base);box-shadow:inset 0 0 0 1.5px var(--line)}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px}
+.ic{width:25px;height:25px;stroke:var(--accent);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.8;display:block;margin-bottom:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:36px;flex:1;min-height:0;align-items:center}
+
+/* ── cover ── */
+.cover{background:var(--base-deep)}
+.cover img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:14% center}
+.cover .scrim{position:absolute;inset:0;background:linear-gradient(
+  to left,
+  rgba(9,13,30,.95) 0%,
+  rgba(12,17,40,.80) 26%,
+  rgba(16,22,52,.42) 52%,
+  rgba(20,28,64,.06) 82%,
+  rgba(20,28,64,0) 100%)}
+.cover .pad{padding:54px 74px}
+.cover .lockup{display:flex;align-items:center;gap:0}
+.cover .lockup svg.ylogo{height:27px;width:auto;display:block}
+.ctext{margin-top:auto;padding-bottom:74px}
+.cover h1{color:#fff}
+.cover .ceye{font-size:12.5px;font-weight:600;letter-spacing:.2em;color:#D9613D;margin-bottom:20px}
+.cover .clead{font-size:19px;line-height:1.6;color:#C6D0DA;margin-top:18px;max-width:58ch}
+.cover .cmeta{margin-top:26px;font-size:13.5px;color:#94A3B1;letter-spacing:.02em}
+
+/* ── timeline (slide 2) ── */
+.tline{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.trow{position:relative;display:flex;align-items:flex-start}
+.trow .rail{position:absolute;top:7px;right:0;left:0;height:1.5px;background:var(--line)}
+.tstep{flex:1;position:relative;padding:0 5px;text-align:center}
+.tstep .dot{width:13px;height:13px;border-radius:50%;background:var(--base);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3);margin:0 auto 15px;position:relative;z-index:2}
+.tstep.hot .dot{background:#D9613D;box-shadow:0 0 0 4px rgba(217,97,61,.22)}
+.tstep .nm{font-size:13.5px;font-weight:600;line-height:1.3;color:#7E8D99}
+.tstep.hot .nm{color:#fff;font-weight:700}
+.tstep .pn{font-size:12px;line-height:1.45;color:#8395A1;margin-top:11px;background:rgba(255,255,255,.045);
+  border-radius:2px;padding:10px 9px;min-height:78px}
+.tstep.hot .pn{background:rgba(217,97,61,.13);color:#D5DBDE;box-shadow:inset 0 0 0 1px rgba(217,97,61,.3)}
+.trow .rail{background:rgba(255,255,255,.16) !important}
+.legend{display:flex;align-items:center;gap:9px;font-size:12.5px;color:#8FA0AC;margin-top:22px}
+.legend i{width:11px;height:11px;border-radius:50%;background:#D9613D;display:block;flex:0 0 11px}
+
+/* ── value grid (slide 4) ── */
+.vgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;flex:1;min-height:0;margin-bottom:16px;align-content:center}
+.vc{background:rgba(255,255,255,.055);border-radius:3px;padding:14px 15px;display:flex;flex-direction:column;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.vc .st{font-size:10px;font-weight:700;letter-spacing:.07em;padding:3px 9px;border-radius:99px;align-self:flex-start}
+.vc .st.n{background:rgba(126,163,196,.18);color:#9FC0DA}
+.vc .st.a{background:rgba(217,97,61,.16);color:#9BA6AC}
+.vc .st.m{background:rgba(140,180,155,.16);color:#A3C9B2}
+.vc .nm{font-size:14.5px;font-weight:700;line-height:1.25;color:#fff;margin-top:9px}
+.vc .ds{font-size:12.2px;line-height:1.45;color:#93A6B4;margin-top:6px}
+.vc.pick{background:rgba(255,255,255,.13);box-shadow:inset 0 0 0 1.5px rgba(217,97,61,.5)}
+
+/* ── mock panels (slides 5-7) ── */
+.mock{height:392px;background:#fff;border-radius:3px;padding:20px;
+  box-shadow:0 0 0 1px var(--line);display:flex;flex-direction:column;overflow:hidden}
+.mock .mh{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid #E7EAEB;margin-bottom:12px}
+.mock .mh i{width:8px;height:8px;border-radius:50%;background:#DFE3E5;display:block}
+.mock .mt{font-size:12px;font-weight:600;color:#9AA0A3;letter-spacing:.06em;margin-right:6px}
+.mock .demo{margin-right:auto;font-size:10px;font-weight:700;letter-spacing:.07em;color:#AAB2B6;
+  background:#F1F3F3;border-radius:99px;padding:3px 9px}
+.mstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
+.mstrip div{background:#F2F4F4;border-radius:2px;padding:9px 10px}
+.mstrip .v{font-size:19px;font-weight:700;color:var(--base);line-height:1;font-variant-numeric:tabular-nums}
+.mstrip .k{font-size:10.5px;color:#9AA0A3;margin-top:4px}
+.mstrip .alert .v{color:#1A2129}
+.mrow{display:flex;align-items:center;gap:10px;padding:9px 2px 9px 0;border-bottom:1px solid #EDEFF0;
+  font-size:13px;position:relative;padding-right:11px}
+.mrow::before{content:'';position:absolute;right:0;top:11px;bottom:11px;width:3px;border-radius:2px;background:#DFE3E5}
+.mrow.hot::before{background:#1A2129}
+.mrow.ok::before{background:#7FA98F}
+.mbar{flex:0 0 54px;height:5px;background:#EAEDEE;border-radius:3px;overflow:hidden}
+.mbar i{display:block;height:100%;background:#B9C7CF;border-radius:3px}
+.mbar.hot i{background:#1A2129}
+.mrow:last-child{border-bottom:none}
+.mrow .pj{flex:1;font-weight:600;color:var(--base)}
+.mrow .sub{font-size:11.5px;color:#9AA0A3;font-weight:400;display:block;margin-top:2px}
+.chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.chip.w{background:#EDF0F1;color:#1A2129}
+.chip.o{background:#EAF0F4;color:#3C5C74}
+.chip.d{background:#EAF2EC;color:#2F6B4C}
+.mtab{width:100%;border-collapse:collapse;font-size:12.5px}
+.mtab th{background:#F1F3F3;color:#8A8F91;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  padding:8px 7px;text-align:right}
+.mtab td{padding:9px 7px;border-bottom:1px solid #EDEFF0;color:var(--ink);font-variant-numeric:tabular-nums}
+.mtab tr:last-child td{border-bottom:none}
+.mtab .mk{display:inline-block;border:1.5px solid var(--accent);color:var(--accent);
+  border-radius:50%;padding:1px 7px;font-weight:700;font-size:11.5px}
+.flag-row td{background:#EDF0F1}
+.calcrow{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid #EDEFF0;font-size:13px}
+.calcrow b{font-variant-numeric:tabular-nums;font-size:14px;color:var(--base)}
+.calcrow.tot{border-bottom:none;border-top:1.5px solid var(--base);margin-top:6px;padding-top:11px}
+.calcrow.tot b{font-size:19px;color:var(--accent)}
+.sens{margin-top:12px}
+.sens .sl{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#9AA0A3;margin-bottom:8px}
+.sbar{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:11.5px;color:var(--muted)}
+.sbar .t{flex:0 0 78px}
+.sbar .b{flex:1;height:7px;background:#EAEDEE;border-radius:2px;overflow:hidden}
+.sbar .b i{display:block;height:100%;background:var(--accent);border-radius:2px;opacity:.75}
+.subname{font-size:13px;letter-spacing:.1em;color:#A6ACAF;font-weight:600;margin-top:12px}
+.dl{margin-top:4px}
+.dl .r{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--line)}
+.dl .r:last-child{border-bottom:none}
+.dl .k{flex:0 0 76px;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:var(--accent);padding-top:2px}
+.dl .v{flex:1;font-size:16px;line-height:1.55;color:var(--ink)}
+
+/* ── layers (slide 8) ── */
+.lay{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex:1;min-height:0;margin-bottom:16px;align-content:center}
+.lay .card{display:flex;flex-direction:column}
+.lay .lv{font-size:10.5px;font-weight:700;letter-spacing:.09em;color:var(--accent);margin-bottom:9px}
+.lay .who{margin-top:auto;padding-top:12px;font-size:12.5px;color:#9AA0A3;border-top:1px solid #E9ECED}
+
+/* ── chips grid (slide 10) ── */
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex:1;min-height:0;margin-bottom:16px;align-content:center}
+.cg{background:#fff;border-radius:3px;padding:16px 16px}
+.cg .n{font-size:15.5px;font-weight:700;color:var(--base)}
+.cg .d{font-size:12.3px;line-height:1.45;color:var(--muted);margin-top:6px}
+
+/* ── orbit (slide 10) ── */
+.orb{height:384px;position:relative;display:grid;place-items:center;margin:6px 0 14px}
+.orb .core{width:150px;height:150px;border-radius:50%;background:var(--base);color:#fff;display:grid;
+  place-items:center;text-align:center;padding:20px;z-index:3;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.orb .core b{font-size:16px;font-weight:700;line-height:1.25;display:block;color:#fff}
+.orb .core span{font-size:11.5px;color:#9FB2C0;display:block;margin-top:6px}
+.orb .ring{position:absolute;inset:0;pointer-events:none}
+.orb .ring ellipse{fill:none;stroke:#CBD1D4;stroke-width:1;stroke-dasharray:3 6}
+.sat{position:absolute;transform:translate(-50%,-50%);background:#fff;border-radius:3px;padding:9px 13px;
+  box-shadow:0 3px 14px rgba(29,46,61,.11);cursor:default;transition:.24s cubic-bezier(.22,.9,.24,1);
+  width:168px;text-align:center;z-index:2}
+.sat b{font-size:13.5px;font-weight:700;color:var(--base) !important;display:block;line-height:1.25}
+.sat span{font-size:11.5px;line-height:1.4;color:var(--muted);display:block;max-height:0;overflow:hidden;
+  opacity:0;transition:.24s ease}
+.sat:hover,.sat.live{box-shadow:0 10px 30px rgba(29,46,61,.2);transform:translate(-50%,-50%) scale(1.06);z-index:4}
+.sat:hover b,.sat.live b{color:#1A2129 !important}
+.sat:hover span,.sat.live span{max-height:60px;opacity:1;margin-top:5px}
+
+/* ── steps (slide 11) ── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;flex:1;min-height:0;align-content:center}
+.steps .card{background:rgba(255,255,255,.07)}
+.steps .sn{font-size:11px;font-weight:700;letter-spacing:.09em;color:#9BA6AC;margin-bottom:9px}
+
+
+/* ═══ 8 · coach walking the room ═══ */
+.room{position:relative;padding-top:54px;margin-bottom:34px;display:flex;align-items:flex-end;justify-content:center;gap:30px}
+.lap{width:104px;position:relative}
+.lap .scr{height:64px;border-radius:2px 7px 2px 2px;background:rgba(255,255,255,.09);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.19);padding:10px 9px;display:flex;flex-direction:column;gap:5px;
+  transition:.35s cubic-bezier(.22,.9,.24,1)}
+.lap .scr i{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.2)}
+.lap .scr i:nth-child(1){width:72%}.lap .scr i:nth-child(2){width:94%}
+.lap .scr i:nth-child(3){width:58%}.lap .scr i:nth-child(4){width:82%}
+.lap .base{height:6px;border-radius:0 0 5px 5px;background:rgba(255,255,255,.24);margin-top:2px}
+.lap .who2{text-align:center;font-size:11.5px;color:#7E888E;margin-top:11px}
+.coach{position:absolute;top:0;left:50%;transform:translateX(-50%);width:62px;text-align:center}
+.coach::after{content:"";position:absolute;top:calc(100% + 4px);left:50%;width:1px;height:18px;background:rgba(255,255,255,.22)}
+.coach .dot{width:15px;height:15px;border-radius:50%;background:#fff;margin:0 auto 7px;
+  box-shadow:0 0 0 5px rgba(255,255,255,.14)}
+.coach .lb2{font-size:11px;color:#fff;font-weight:700;letter-spacing:.06em}
+
+/* ═══ 10 · library spines ═══ */
+.libr{flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;gap:11px;padding-bottom:14px;
+  position:relative}
+.libr::after{content:'';position:absolute;bottom:0;right:6%;left:6%;height:3px;background:var(--line);border-radius:2px}
+.spine{width:88px;height:262px;background:#fff;border-radius:3px;box-shadow:0 0 0 1px var(--line);
+  display:flex;align-items:center;justify-content:center;transition:.26s cubic-bezier(.22,.9,.24,1);
+  border-top:3px solid var(--line);cursor:default}
+.spine span{writing-mode:vertical-rl;font-size:14px;font-weight:600;color:var(--ink);
+  line-height:1.3;letter-spacing:.01em;max-height:180px}
+.spine:hover{transform:translateY(-16px);box-shadow:0 16px 34px rgba(20,23,26,.16)}
+.spine.main{width:136px;height:304px;background:var(--base);border-top-color:#8A9298}
+.spine.main span{color:#fff;font-size:17.5px;font-weight:700}
+.spine.main:hover{transform:translateY(-16px)}
+
+
+/* ═══ 10 · playbook contents ═══ */
+.pbook{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1.55fr;gap:34px;align-items:center}
+.pcover{background:var(--base);border-radius:2px;padding:32px 30px;height:296px;display:flex;
+  flex-direction:column;position:relative;overflow:hidden}
+.pcover::after{content:'';position:absolute;top:0;bottom:0;right:0;width:7px;background:rgba(255,255,255,.09)}
+.pcover .pk{font-size:10.5px;font-weight:700;letter-spacing:.2em;color:#7E888E}
+.pcover b{font-size:31px;color:#fff;line-height:1.15;margin-top:auto;letter-spacing:-.02em}
+.pcover span{font-size:14px;color:#98A2A8;margin-top:14px;line-height:1.55}
+.pcover .edge{height:1px;background:rgba(255,255,255,.16);margin-top:22px}
+.toc2{display:flex;flex-direction:column;gap:0}
+.toc2 .row2{display:flex;align-items:baseline;gap:12px;padding:13px 2px;border-bottom:1px solid var(--line);
+  transition:.2s ease}
+.toc2 .row2:last-child{border-bottom:none}
+.toc2 .row2:hover{padding-right:8px}
+.toc2 .row2 .i2{flex:0 0 26px;font-size:11.5px;font-weight:700;color:#A6ACAF;font-variant-numeric:tabular-nums}
+.toc2 .row2 b{font-size:16.5px;font-weight:600;color:var(--ink);white-space:nowrap}
+.toc2 .row2 .dots{flex:1;border-bottom:1px dotted #C4CACD;transform:translateY(-4px)}
+.toc2 .row2 span{font-size:13px;color:var(--muted);white-space:nowrap}
+
+/* ═══ 11 · dimension line ═══ */
+.dim{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:0 8px}
+.dimline{position:relative;height:2px;background:rgba(255,255,255,.28);margin:52px 0 0}
+.dimline::before,.dimline::after{content:'';position:absolute;top:-5px;width:2px;height:12px;background:rgba(255,255,255,.5)}
+.dimline::before{right:0}.dimline::after{left:0}
+.dimends{display:flex;justify-content:space-between;font-size:12.5px;color:#8A949A;margin-top:11px;letter-spacing:.04em}
+.dimsegs{display:flex;justify-content:space-between;gap:14px;position:relative}
+.dimseg{flex:1;text-align:center;position:relative;padding-bottom:26px}
+.dimseg .tick{position:absolute;bottom:0;right:50%;width:1px;height:20px;background:rgba(255,255,255,.24)}
+.dimseg p{font-size:16.5px;line-height:1.4;color:#fff;font-weight:500;margin:0}
+.dimseg .qn2{display:block;font-size:11px;font-weight:700;color:#9BA6AC;letter-spacing:.1em;margin-bottom:9px}
+.baseline{display:flex;align-items:center;justify-content:center;gap:0;margin-top:26px}
+
+/* ═══ 12 · grid bubbles ═══ */
+.axis{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;position:relative}
+.axisline{position:absolute;top:50%;right:9%;left:9%;height:1.5px;background:var(--line);transform-origin:right center}
+.slide.on .axisline{animation:drawline .8s cubic-bezier(.4,0,.2,1) .3s both}
+.bubs{display:flex;justify-content:space-between;position:relative;z-index:2;padding:0 4%}
+.bub{width:31%;text-align:center}
+.bub .circ{width:74px;height:74px;border-radius:50%;background:var(--bg);margin:0 auto 20px;
+  display:grid;place-items:center;font-size:19px;font-weight:700;color:var(--muted);
+  box-shadow:inset 0 0 0 1.5px var(--line);transition:.3s cubic-bezier(.22,.9,.24,1);font-variant-numeric:tabular-nums}
+.bub b{font-size:21px;color:var(--ink);display:block;line-height:1.2}
+.bub span{font-size:14px;color:var(--muted);display:block;margin-top:9px;line-height:1.5}
+.bub.now .circ{background:var(--base);color:#fff;box-shadow:none}
+.bub:hover .circ{transform:scale(1.07)}
+.cta{margin-top:26px;background:var(--base);color:#fff;border-radius:2px;padding:19px 26px;
+  font-size:19px;font-weight:600;text-align:center}
+.cta b{color:#fff;font-weight:700;border-bottom:2px solid #6C7378;padding-bottom:2px}
+
+/* ═══ 9 · travelling marker ═══ */
+.lnode{transition:.3s cubic-bezier(.22,.9,.24,1)}
+.lnode:hover{transform:translate(-50%,-50%) scale(1.06);box-shadow:0 10px 26px rgba(20,23,26,.16)}
+.lcore{background:var(--base) !important;box-shadow:none !important}
+
+/* closing slide */
+.thanks{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:100%}
+.thanks .big{font-size:42px;font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.2}
+.thanks .close2{font-size:23px;color:#9FB2C0;margin-top:18px;font-weight:400;line-height:1.5}
+.thanks .sig{margin-top:56px;padding-top:22px;border-top:1px solid rgba(255,255,255,.16);
+  font-size:14px;color:#8FA0AC;line-height:1.9}
+.thanks .sig b{color:#fff !important;font-weight:600;font-size:16px}
+/* thanks: the one place colour returns */
+.thanks .rule2{width:52px;height:3px;background:var(--coral);border-radius:2px;margin-bottom:28px}
+.thanks .ylogo2{margin-top:40px;height:22px;opacity:.9}
+
+
+/* ═══ 8 · a real desk, not a flowchart ═══ */
+.desk{flex:1;min-height:0;display:grid;grid-template-columns:1.5fr .82fr;gap:26px;align-items:center}
+.screen{background:rgba(255,255,255,.055);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+  border-radius:3px;padding:20px 22px;height:238px;display:flex;flex-direction:column}
+.screen .st2{display:flex;align-items:center;gap:9px;padding-bottom:11px;
+  border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:14px}
+.screen .st2 b{font-size:14px;color:#fff;font-weight:600}
+.screen .st2 span{font-size:11.5px;color:#7E888E;margin-right:auto;letter-spacing:.05em}
+.screen .task{font-size:19px;color:#fff;font-weight:600;line-height:1.3}
+.screen .body2{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.screen .body2 i{display:block;height:5px;border-radius:2px;background:rgba(255,255,255,.13)}
+.screen .body2 i:nth-child(1){width:88%}.screen .body2 i:nth-child(2){width:96%}
+.screen .body2 i:nth-child(3){width:72%}.screen .body2 i:nth-child(4){width:83%}
+.screen .cursor{margin-top:auto;font-size:12.5px;color:#8FA0AC;display:flex;align-items:center;gap:8px}
+.screen .cursor::before{content:'';width:2px;height:14px;background:#9BA6AC;display:block}
+.peers{display:flex;flex-direction:column;gap:11px}
+.pscr{background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  border-radius:3px;height:60px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.pscr i{display:block;height:4px;border-radius:2px;background:rgba(255,255,255,.1)}
+.pscr i:nth-child(1){width:64%}.pscr i:nth-child(2){width:84%}
+.pscr b{font-size:11.5px;color:#69747A;font-weight:500}
+.seq{display:flex;align-items:center;justify-content:space-between;margin:22px 0 0;padding-top:0}
+.seq span{font-size:14.5px;color:#93A3AE;padding:0 18px;border-left:1px solid rgba(255,255,255,.13);flex:1;text-align:center}
+.seq span:last-child{border-left:none;color:#fff;font-weight:600}
+.seq span:first-child{padding-right:0}
+
+/* ═══ 9 · four beats ═══ */
+.loop4{height:326px;position:relative;display:grid;place-items:center}
+.loop4 .arcs{position:absolute;inset:0}
+.loop4 .arcs circle{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:4 7}
+.l4core{width:170px;height:170px;border-radius:50%;background:var(--base);display:grid;place-items:center;
+  text-align:center;z-index:3}
+.l4core b{font-size:21px;font-weight:700;color:#fff !important;display:block}
+.l4core span{font-size:12px;color:#8FA0AC;display:block;margin-top:6px;letter-spacing:.06em}
+.l4n{position:absolute;transform:translate(-50%,-50%);text-align:center;z-index:2;width:200px}
+.l4n b{font-size:21px;font-weight:700;color:var(--ink);display:block;line-height:1.2}
+.l4n span{font-size:13.5px;color:var(--muted);display:block;margin-top:5px}
+
+/* ═══ 10 · title block of assets ═══ */
+.block{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.block .bhead{border-top:2px solid var(--base);border-bottom:1px solid var(--line);
+  padding:14px 0;display:flex;align-items:baseline;gap:14px}
+.block .bhead b{font-size:25px;font-weight:700;letter-spacing:-.015em}
+.block .bhead span{font-size:12px;color:#9AA2A7;letter-spacing:.14em;margin-right:auto}
+.fields{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:2px solid var(--base)}
+.fld{padding:26px 18px 24px;border-left:1px solid var(--line)}
+.fld:last-child{border-left:none}
+.fld .fn{font-size:10.5px;font-weight:700;letter-spacing:.12em;color:#A6ACAF;margin-bottom:14px}
+.fld svg{width:24px;height:24px;stroke:var(--base);stroke-width:1.4;fill:none;stroke-linecap:round;
+  stroke-linejoin:round;display:block;margin-bottom:14px;opacity:.85}
+.fld b{font-size:16px;line-height:1.28;display:block;color:var(--ink)}
+.fld span{font-size:12.5px;line-height:1.45;color:var(--muted);display:block;margin-top:8px}
+
+/* ═══ 11 · four plain questions ═══ */
+.q4b{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.q4b .qq{display:flex;align-items:baseline;gap:20px;padding:22px 0;border-bottom:1px solid rgba(255,255,255,.13)}
+.q4b .qq:last-of-type{border-bottom:none}
+.q4b .qq i{font-style:normal;font-size:11.5px;font-weight:700;color:#69747A;letter-spacing:.1em;flex:0 0 24px}
+.q4b .qq p{font-size:27px;font-weight:600;color:#fff;line-height:1.25;margin:0;letter-spacing:-.015em}
+.q4b .under{margin-top:24px;font-size:13.5px;color:#7E888E;letter-spacing:.02em}
+
+/* ═══ 12 · three planning stages, only the first is drawn ═══ */
+.stages{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-content:center}
+.stg{padding:28px 24px;border-radius:3px;min-height:196px;display:flex;flex-direction:column}
+.stg .sn2{font-size:11px;font-weight:700;letter-spacing:.14em;margin-bottom:16px}
+.stg b{font-size:23px;line-height:1.2;display:block;letter-spacing:-.015em}
+.stg span{font-size:14.5px;line-height:1.55;margin-top:12px;display:block}
+.stg.solid{background:var(--base)}
+.stg.solid .sn2{color:#9BA6AC}.stg.solid b{color:#fff}.stg.solid span{color:#9FB2C0}
+.stg.line{box-shadow:inset 0 0 0 1.5px var(--line)}
+.stg.line .sn2{color:#A6ACAF}.stg.line b{color:var(--ink)}.stg.line span{color:var(--muted)}
+.stg.ghost{box-shadow:inset 0 0 0 1.5px transparent;
+  background-image:repeating-linear-gradient(0deg,var(--line) 0 6px,transparent 6px 12px),
+    repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 12px),
+    repeating-linear-gradient(180deg,var(--line) 0 6px,transparent 6px 12px),
+    repeating-linear-gradient(270deg,var(--line) 0 6px,transparent 6px 12px);
+  background-size:1.5px 100%,100% 1.5px,1.5px 100%,100% 1.5px;
+  background-position:0 0,0 0,100% 0,0 100%;background-repeat:no-repeat}
+.stg.ghost .sn2{color:#B6BDC1}.stg.ghost b{color:#5F686D}.stg.ghost span{color:#8F979B}
+.next{margin-top:22px;border-top:2px solid var(--base);padding-top:18px;display:flex;align-items:baseline;gap:14px}
+.next .nl{font-size:11px;font-weight:700;letter-spacing:.16em;color:#9AA2A7;flex:0 0 auto}
+.next b{font-size:22px;font-weight:700;letter-spacing:-.015em}
+
+
+/* ════════════ ABOUT SLIDE · imported verbatim, namespaced under .about ════════════ */
+@font-face{font-family:Head;src:url(assets/fonts/miriamlibre-hebrew.woff2) format('woff2');
+  font-weight:400 700;font-display:block;
+  unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+@font-face{font-family:Head;src:url(assets/fonts/miriamlibre-latin.woff2) format('woff2');
+  font-weight:400 700;font-display:block}
+@font-face{font-family:Body;src:url(assets/fonts/heebo-hebrew.woff2) format('woff2');
+  font-weight:400 700;font-display:block;
+  unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+@font-face{font-family:Body;src:url(assets/fonts/heebo-latin.woff2) format('woff2');
+  font-weight:400 700;font-display:block}
+
+.slide.about{font-family:Body,'Assistant','Heebo',Arial,sans-serif}
+.about .eyebrow{font-family:Body;margin-bottom:30px}
+.about h1{font-family:Head;font-size:40px;font-weight:700;line-height:1.16;
+  letter-spacing:-.012em;color:var(--base)}
+.about .idn{margin-top:26px}
+.about .idn .nm{font-family:Head;font-size:20px;font-weight:700;line-height:1.3;color:var(--ink)}
+.about .idn .rl{direction:ltr;text-align:right;margin-top:5px;
+  font-size:14px;font-weight:500;letter-spacing:.01em;color:var(--muted)}
+.about .idn .rl .dot{color:#B6BDC1;margin:0 7px}
+.about .abody{margin-top:44px;display:grid;grid-template-columns:1.6fr 1fr;gap:56px;align-items:start}
+.about .abody p{font-size:16px;line-height:1.72;color:var(--muted)}
+.about .abody p+p{margin-top:15px}
+.about .stmt .srule{width:32px;height:1px;background:#C2C8CB;margin-bottom:18px}
+.about .stmt p{font-family:Head;font-size:19px;font-weight:400;line-height:1.62;color:#39424A}
+.about .band{margin-top:auto;padding-top:28px;border-top:1px solid var(--line)}
+.about .band .cap{font-family:Body;font-size:11.5px;font-weight:600;letter-spacing:.06em;
+  color:#9AA2A7;margin-bottom:26px}
+.about .lrow{display:flex;justify-content:space-between;align-items:center}
+.about .lrow+.lrow{margin-top:28px}
+.about .lg{flex:none;height:var(--h);display:block}
+.about .lg img{display:block;height:100%;width:auto;opacity:.58}
+.about .lg-akamai{--h:30.5px}   .about .lg-booking{--h:17.4px}
+.about .lg-checkpoint{--h:32.3px} .about .lg-citi{--h:31.1px}
+.about .lg-elal{--h:14.4px}     .about .lg-google{--h:26.8px}
+.about .lg-mobileye{--h:16.9px} .about .lg-monday{--h:19.4px}
+.about .lg-nvidia{--h:18.5px}   .about .lg-paloalto{--h:17.9px}
+.about .lg-payoneer{--h:21.2px} .about .lg-philips{--h:15.7px}
+.about .lg-solaredge{--h:18.2px}.about .lg-taboola{--h:18.1px}
+.about .lg-unity{--h:26.7px}    .about .lg-wix{--h:23.1px}
+/* the deck's stagger, applied to the logo rows too */
+.about .lrow{opacity:0}
+.slide.on .about-x,.slide.about.on .lrow{animation:rise .48s cubic-bezier(.22,.9,.24,1) both}
+.slide.about.on .lrow:nth-of-type(1){animation-delay:.40s}
+.slide.about.on .lrow:nth-of-type(2){animation-delay:.48s}
+
+/* chrome */
+#chrome{position:fixed;bottom:0;left:0;right:0;height:34px;z-index:20;pointer-events:none;
+  display:flex;align-items:flex-end}
+#bar{position:absolute;bottom:0;right:0;height:2px;background:#2A343B;transition:width .45s cubic-bezier(.22,.9,.24,1)}
+
+#cnt{position:absolute;bottom:11px;left:20px;font-variant-numeric:tabular-nums;direction:ltr;
+  font-size:11px;letter-spacing:.1em;color:#4A575F}
+#hint{position:fixed;top:11px;left:16px;font-size:10.5px;color:#3A464E;z-index:20;transition:opacity .6s;letter-spacing:.06em}
+#rotate{display:none;position:fixed;inset:0;z-index:60;background:var(--base-deep);
+  align-items:center;justify-content:center;text-align:center;padding:36px}
+#rotate .t2{font-size:17px;font-weight:600;color:#fff;line-height:1.4}
+#rotate .s2{font-size:14px;color:#A9BCC8;line-height:1.6;margin-top:10px;max-width:24ch}
+@media (max-width:760px) and (orientation:portrait){#rotate{display:flex}}
+/* ═══ micro-interactions ═══ */
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes popin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes drawline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.slide:not(.cover) .pad>*{opacity:0}
+.slide.on:not(.cover) .pad>*{animation:rise .5s cubic-bezier(.22,.9,.24,1) both}
+.slide.on:not(.cover) .pad>*:nth-child(1){animation-delay:.04s}
+.slide.on:not(.cover) .pad>*:nth-child(2){animation-delay:.11s}
+.slide.on:not(.cover) .pad>*:nth-child(3){animation-delay:.19s}
+.slide.on:not(.cover) .pad>*:nth-child(4){animation-delay:.27s}
+.slide.on:not(.cover) .pad>*:nth-child(5){animation-delay:.34s}
+.slide.on:not(.cover) .pad>*:nth-child(6){animation-delay:.41s}
+/* children of grids cascade */
+.lanes>*,.ladder>*,.fields>*,.stages>*,.qq,.pscr,.qs4>*,.vgrid>*,.trio>*,.lay>*,.vs>*,.steps>*,.phases>*,.dimseg,.spine,.lap,.trk{opacity:0}
+.slide.on .lanes>*,.slide.on .ladder>*,.slide.on .fields>*,.slide.on .stages>*,.slide.on .qq,.slide.on .pscr,.slide.on .qs4>*,.slide.on .vgrid>*,
+.slide.on .trio>*,.slide.on .lay>*,.slide.on .vs>*,.slide.on .steps>*,.slide.on .phases>*,
+.slide.on .dimseg,.slide.on .spine,.slide.on .lap,.slide.on .trk{animation:rise .48s cubic-bezier(.22,.9,.24,1) both}
+.slide.on :is(.lanes,.ladder,.fields,.stages,.q4b,.qs4,.vgrid,.trio,.lay,.vs,.steps,.phases)>*:nth-child(1){animation-delay:.26s}
+.slide.on :is(.lanes,.ladder,.fields,.stages,.q4b,.qs4,.vgrid,.trio,.lay,.vs,.steps,.phases)>*:nth-child(2){animation-delay:.33s}
+.slide.on :is(.lanes,.ladder,.fields,.stages,.q4b,.qs4,.vgrid,.trio,.lay,.vs,.steps,.phases)>*:nth-child(3){animation-delay:.40s}
+.slide.on :is(.lanes,.ladder,.fields,.stages,.q4b,.qs4,.vgrid,.trio,.lay,.vs,.steps,.phases)>*:nth-child(4){animation-delay:.47s}
+.slide.on :is(.lanes,.ladder,.fields,.stages,.q4b,.qs4,.vgrid,.trio,.lay,.vs,.steps,.phases)>*:nth-child(5){animation-delay:.54s}
+.slide.on :is(.lanes,.ladder,.fields,.stages,.q4b,.qs4,.vgrid,.trio,.lay,.vs,.steps,.phases)>*:nth-child(n+6){animation-delay:.60s}
+.slide.on .trk:nth-child(1){animation-delay:.24s}
+.slide.on .trk:nth-child(2){animation-delay:.42s}
+.slide.on .lap:nth-child(1){animation-delay:.24s}.slide.on .lap:nth-child(2){animation-delay:.32s}
+.slide.on .lap:nth-child(3){animation-delay:.40s}.slide.on .lap:nth-child(4){animation-delay:.48s}
+.slide.on .lap:nth-child(5){animation-delay:.56s}
+.slide.on .note{animation:popin .55s cubic-bezier(.34,1.4,.5,1) both}
+.slide.on .note:nth-child(1){animation-delay:.34s}.slide.on .note:nth-child(2){animation-delay:.44s}
+.slide.on .note:nth-child(3){animation-delay:.54s}.slide.on .note:nth-child(4){animation-delay:.64s}
+.slide.on .note:nth-child(5){animation-delay:.74s}
+.note{opacity:0}
+/* hover lift */
+.lane,.rung,.bk,.ph,.vsc,.card,.vc{transition:transform .22s cubic-bezier(.22,.9,.24,1),box-shadow .22s ease}
+.lane:hover,.rung:hover,.ph:hover,.vsc:hover{transform:translateY(-3px);box-shadow:0 0 0 1.5px #C7CDD0}
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:none}
+  *,*::before,*::after{animation:none !important;opacity:1 !important;transform:none !important}
+}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:#fff;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;box-shadow:none;width:1280px;height:auto}
+  .slide{position:relative;opacity:1!important;transform:none!important;height:720px;
+    break-after:page;page-break-after:always;pointer-events:auto;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .slide::after{display:none}
+  #chrome,#hint,#rotate{display:none}
+}
+
+/* ═══════════ v2 components ═══════════ */
+.big-q{font-size:44px;font-weight:700;line-height:1.2;letter-spacing:-.015em;color:var(--base);text-align:center}
+.dark .big-q{color:#fff}
+
+/* two tracks (slide 2) */
+.tracks{display:flex;flex-direction:column;gap:34px;flex:1;min-height:0;justify-content:center}
+.trk{display:flex;align-items:center;gap:0}
+.trk .lbl{flex:0 0 104px;font-size:15.5px;font-weight:700;letter-spacing:.03em}
+.trk .flow{flex:1;display:flex;align-items:center;gap:0;position:relative}
+.stepx{background:rgba(255,255,255,.07);border-radius:3px;padding:15px 22px;font-size:16.5px;font-weight:600;
+  white-space:nowrap;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
+.arw{flex:0 0 34px;text-align:center;color:#7E8D99;font-size:15px}
+.trk.a .lbl{color:#8FA0AC}
+.trk.a .stepx{color:#A9BAC6}
+.trk.a .stop{margin-right:14px;font-size:13.5px;color:#7E8D99;font-style:italic}
+.trk.b .lbl{color:#9BA6AC}
+.trk.b .stepx{color:#fff;background:rgba(155,166,172,.14);box-shadow:inset 0 0 0 1px rgba(155,166,172,.3)}
+.trk.b .arw{color:#9BA6AC}
+.trk.b .stepx.habit{background:#9BA6AC !important;color:#1D2E3D !important;font-weight:700;box-shadow:none !important}
+
+/* three tracks (slide 3) */
+.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;flex:1;min-height:0;align-content:center}
+.lane{background:#fff;border-radius:3px;padding:24px 22px;display:flex;flex-direction:column}
+.lane h3{font-size:21px;margin-bottom:4px}
+.lane .rule{height:3px;width:38px;border-radius:2px;background:var(--accent);margin:12px 0 16px}
+.lane ul{list-style:none;padding:0;margin:0}
+.lane li{font-size:15px;line-height:1.5;color:var(--muted);padding:6px 0;display:flex;gap:9px;align-items:center}
+.lane li::before{content:'';width:4px;height:4px;border-radius:50%;background:#C5CBCE;flex:0 0 4px}
+
+/* sticky notes (slide 4) */
+.notes{position:absolute;inset:0;pointer-events:none}
+.note{position:absolute;width:236px;font-size:14.5px;line-height:1.5;color:#7D888F;
+  font-style:italic;padding-right:13px;border-right:1px solid rgba(255,255,255,.13)}
+.qwrap{position:relative;flex:1;min-height:0;display:grid;place-items:center;padding:0 40px}
+.qbox{position:relative;z-index:2;text-align:center;width:660px}
+.qmark{font-size:70px;line-height:.6;color:#9BA6AC;opacity:.5;font-weight:700}
+.rules3{display:flex;justify-content:center;gap:0;margin:14px 0 4px}
+.rules3 span{font-size:14.5px;color:#93A6B4;padding:0 20px;border-left:1px solid rgba(255,255,255,.16)}
+.rules3 span:last-child{border-left:none}
+
+/* before / after (slide 5) */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1;min-height:0;align-content:center}
+.vsc{border-radius:3px;padding:22px 24px;display:flex;flex-direction:column;min-height:264px}
+.vsc.thin{background:#EDEFF0;box-shadow:inset 0 0 0 1px #DDE1E3}
+.vsc.rich{background:#fff;box-shadow:0 0 0 1px var(--line)}
+.vsc .cap{font-size:12px;font-weight:700;letter-spacing:.08em;color:#9AA0A3;margin-bottom:14px}
+.vsc.rich .cap{color:var(--accent)}
+.bubble{background:#fff;border-radius:3px 12px 12px 4px;padding:12px 15px;font-size:14.5px;color:#5B6165;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:9px}
+.vsc.thin .bubble{background:#F2F4F4}
+.reply{font-size:13.5px;line-height:1.55;color:#8A8F91;font-style:italic}
+.ctx{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto}
+.ctx span{font-size:12px;font-weight:600;background:#EDEFF0;color:#5B6165;padding:5px 11px;border-radius:99px}
+.vsc .verdict{margin-top:16px;padding-top:13px;border-top:1px solid #E7EAEB;font-size:14px;font-weight:600;color:var(--base)}
+
+/* file tree (slide 6) */
+.tree{background:#fff;border-radius:3px;padding:22px 26px;box-shadow:0 0 0 1px var(--line);
+  height:352px;display:flex;flex-direction:column}
+.tree .th{display:flex;align-items:center;gap:10px;padding-bottom:13px;border-bottom:1px solid #E9ECED;margin-bottom:13px}
+.tree .th b{font-size:16.5px;color:var(--base)}
+.tree .th .tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#AAB2B6;background:#F1F3F3;
+  padding:3px 9px;border-radius:99px;margin-right:auto}
+.tr{display:flex;align-items:center;gap:10px;padding:7px 0 7px 0;font-size:14.5px;color:#3E4448}
+.tr .ico{width:15px;height:15px;flex:0 0 15px;stroke:#9DA5AA;stroke-width:1.6;fill:none}
+.tr.key{color:var(--base);font-weight:700}
+.tr.key .ico{stroke:var(--accent)}
+.tr .note2{margin-right:auto;font-size:12px;color:#9DA5AA}
+.side{display:flex;flex-direction:column;gap:11px;justify-content:center}
+.sidec{background:var(--base);color:#fff;border-radius:3px;padding:15px 18px}
+.sidec b{font-size:15px;display:block;color:#fff !important}
+.sidec span{font-size:12.5px;color:#9FB2C0;display:block;margin-top:4px;line-height:1.45}
+
+/* learn ladder (slide 7) */
+.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;flex:1;min-height:0;align-items:end;
+  align-content:center;position:relative}
+.ladder::before{content:'';position:absolute;bottom:-16px;right:0;left:0;height:1px;background:var(--line)}
+.rung:nth-child(1){margin-bottom:0}
+.rung:nth-child(2){margin-bottom:17px}
+.rung:nth-child(3){margin-bottom:34px}
+.rung:nth-child(4){margin-bottom:51px}
+.rung:nth-child(5){margin-bottom:68px}
+.rung{background:#fff;border-radius:3px;padding:20px 17px;display:flex;flex-direction:column;position:relative}
+.rung .n2{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--accent);margin-bottom:11px}
+.rung b{font-size:18px;color:var(--base);line-height:1.2}
+.rung span{font-size:12.8px;line-height:1.5;color:var(--muted);margin-top:9px}
+
+/* session flow (slide 8) */
+.laptops{display:flex;align-items:flex-end;justify-content:center;gap:16px;margin-bottom:26px}
+.lap{width:92px}
+.lap .scr{height:56px;border-radius:2px 6px 2px 2px;background:rgba(255,255,255,.1);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+.lap .base{height:5px;border-radius:0 0 4px 4px;background:rgba(255,255,255,.22);margin-top:2px}
+.lap.me .scr{background:rgba(155,166,172,.22);box-shadow:inset 0 0 0 1.5px rgba(155,166,172,.55);height:44px}
+.lap.me .base{background:rgba(155,166,172,.6)}
+.lap .who2{text-align:center;font-size:11.5px;color:#8FA0AC;margin-top:9px}
+.lap.me .who2{color:#9BA6AC;font-weight:700}
+.chain{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.chain b{font-size:14.5px;font-weight:600;color:#fff;background:rgba(255,255,255,.08);
+  padding:10px 16px;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.chain i{color:#9BA6AC;font-style:normal;padding:0 12px;font-size:15px}
+.chain b.last{background:rgba(155,166,172,.16);box-shadow:inset 0 0 0 1px rgba(155,166,172,.36)}
+
+/* loop (slide 9) */
+.loopw{height:352px;position:relative;display:grid;place-items:center}
+.loopw .ring2{position:absolute;inset:0}
+.loopw .ring2 circle{fill:none;stroke:#D3D8DA;stroke-width:1.5;stroke-dasharray:5 7}
+.lcore{width:158px;height:158px;border-radius:50%;background:var(--accent);color:#fff;display:grid;
+  place-items:center;text-align:center;z-index:3;box-shadow:0 12px 34px rgba(26,33,41,.3)}
+.lcore b{font-size:19px;font-weight:700;color:#fff}
+.lnode{position:absolute;transform:translate(-50%,-50%);background:#fff;border-radius:3px;padding:11px 15px;
+  box-shadow:0 0 0 1px var(--line);font-size:14px;font-weight:600;color:var(--base);white-space:nowrap;z-index:2}
+.lnode i{display:block;font-size:10.5px;font-weight:700;color:var(--accent);font-style:normal;letter-spacing:.07em;margin-bottom:3px}
+
+/* playbook shelf (slide 10) */
+.shelf{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;flex:1;min-height:0;align-content:center}
+.bk{background:#fff;border-radius:3px;padding:17px 18px;border-right:4px solid var(--accent);
+  box-shadow:0 0 0 1px var(--line)}
+.bk b{font-size:15px;color:var(--base);display:block;line-height:1.25}
+.bk span{font-size:12.3px;color:var(--muted);display:block;margin-top:6px;line-height:1.45}
+.bk.wide{grid-column:span 2;background:var(--base);border-right-color:#9BA6AC}
+.bk.wide b,.bk.wide span{color:#fff}
+.bk.wide span{color:#9FB2C0}
+
+/* measure (slide 11) */
+.qs4{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;flex:1;min-height:0;align-content:center}
+.q4{background:rgba(255,255,255,.07);border-radius:3px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.q4 .qn{flex:0 0 30px;height:30px;border-radius:50%;background:rgba(155,166,172,.2);color:#9BA6AC;
+  display:grid;place-items:center;font-weight:700;font-size:14px}
+.q4 p{font-size:16.5px;line-height:1.45;color:#fff;margin:0;font-weight:500}
+.baseline{display:flex;align-items:center;justify-content:center;gap:0;margin-top:18px}
+.baseline span{font-size:14.5px;color:#AFC0CD;padding:8px 20px;background:rgba(255,255,255,.06);border-radius:2px}
+.baseline i{color:#9BA6AC;font-style:normal;padding:0 12px}
+
+/* start (slide 12) */
+.phases{display:flex;align-items:stretch;gap:0;flex:1;min-height:0;align-items:center}
+.ph{flex:1;background:#fff;border-radius:3px;padding:24px 22px;box-shadow:0 0 0 1px var(--line)}
+.ph .pn2{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+.ph b{font-size:20px;color:var(--base);display:block;line-height:1.2}
+.ph span{font-size:13.5px;color:var(--muted);display:block;margin-top:9px;line-height:1.5}
+.ph.now{background:var(--base);box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.ph.now b{color:#fff}.ph.now span{color:#9FB2C0}.ph.now .pn2{color:#9BA6AC}
+.phsep{flex:0 0 46px;text-align:center;color:#C0C7CA;font-size:19px}
+.cta{margin-top:20px;background:var(--base);color:#fff;border-radius:3px;padding:18px 26px;
+  font-size:19px;font-weight:600;text-align:center}
+.cta b{color:#9BA6AC;font-weight:700}
+
+/* appendix divider */
+.divider{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center}
+.divider .dl2{font-size:12px;font-weight:700;letter-spacing:.22em;color:#9BA6AC;margin-bottom:20px}
+.divider .dt{font-size:46px;font-weight:700;color:#fff;letter-spacing:-.02em}
+.divider .ds2{font-size:17px;color:#AFC0CD;margin-top:16px;max-width:48ch;line-height:1.6}
+
+</style>
+</head>
+<body>
+
+<div id="rotate"><div>
+  <div class="t2">סובבו את המכשיר לרוחב</div>
+  <div class="s2">המצגת בנויה למסך רחב. לצפייה נוחה מומלץ מחשב או טאבלט.</div>
+</div></div>
+<div id="hint">← → מעבר בין שקפים · F מסך מלא</div>
+
+<div id="viewport"><div id="stage"><!-- 1 · COVER -->
+<section class="slide cover on" data-act="cover">
+  <img class="bg" src="assets/yoma_givaat-yeaarim_small-102.jpg" alt="">
+  <div class="scrim"></div>
+  <div class="pad">
+    <div class="lockup"><svg class="ylogo" xmlns="http://www.w3.org/2000/svg" width="175" height="20" viewBox="0 0 175 20" fill="none"><g clip-path="url(#clip0_2_277)"><path d="M19.2864 0C18.8906 0 18.5727 0.317841 18.5727 0.713643V8.56972C18.5727 8.96552 18.2549 9.28336 17.8591 9.28336H2.14093C1.74513 9.28336 1.42729 8.96552 1.42729 8.56972V0.713643C1.42729 0.317841 1.10945 0 0.713643 0C0.317841 0 0 0.317841 0 0.713643V8.56972C0 8.96552 0.317841 9.28336 0.713643 9.28336C1.10945 9.28336 1.42729 9.6012 1.42729 9.997C1.42729 10.3928 1.74513 10.7106 2.14093 10.7106H8.56972C8.96552 10.7106 9.28336 11.0285 9.28336 11.4243V19.2804C9.28336 19.6762 9.6012 19.994 9.997 19.994C10.3928 19.994 10.7106 19.6762 10.7106 19.2804V11.4243C10.7106 11.0285 11.0285 10.7106 11.4243 10.7106H17.8531C18.2489 10.7106 18.5667 10.3928 18.5667 9.997C18.5667 9.6012 18.8846 9.28336 19.2804 9.28336C19.6762 9.28336 19.994 8.96552 19.994 8.56972V0.713643C19.994 0.317841 19.6762 0 19.2804 0H19.2864Z" fill="#DED8CD"></path><path d="M99.2942 1.42729C98.8984 1.42729 98.5805 1.10945 98.5805 0.713643C98.5805 0.317841 98.2567 0 97.8669 0H82.1487C81.7529 0 81.4351 0.317841 81.4351 0.713643C81.4351 1.10945 81.1173 1.42729 80.7215 1.42729C80.3257 1.42729 80.0078 1.74513 80.0078 2.14093V19.2864C80.0078 19.6822 80.3257 20 80.7215 20C81.1173 20 81.4351 19.6822 81.4351 19.2864V11.4243C81.4351 11.0285 81.7529 10.7106 82.1487 10.7106H97.8669C98.2627 10.7106 98.5805 11.0285 98.5805 11.4243V19.2864C98.5805 19.6822 98.8984 20 99.2942 20C99.69 20 100.008 19.6822 100.008 19.2864V2.14093C100.008 1.74513 99.684 1.42729 99.2942 1.42729ZM82.1487 9.28936C81.7529 9.28936 81.4351 8.97151 81.4351 8.57571V2.14093C81.4351 1.74513 81.7529 1.42729 82.1487 1.42729H97.8669C98.2627 1.42729 98.5805 1.74513 98.5805 2.14093V8.56972C98.5805 8.96552 98.2567 9.28336 97.8669 9.28336H82.1487V9.28936Z" fill="#DED8CD"></path><path d="M43.5754 1.42729C43.1796 1.42729 42.8618 1.10945 42.8618 0.713643C42.8618 0.317841 42.5439 0 42.1481 0H26.43C26.0342 0 25.7163 0.317841 25.7163 0.713643C25.7163 1.10945 25.3985 1.42729 25.0027 1.42729C24.6069 1.42729 24.2891 1.74513 24.2891 2.14093V17.8591C24.2891 18.2549 24.6069 18.5727 25.0027 18.5727C25.3985 18.5727 25.7163 18.8906 25.7163 19.2864C25.7163 19.6822 26.0342 20 26.43 20H42.1481C42.5439 20 42.8618 19.6822 42.8618 19.2864C42.8618 18.8906 43.1796 18.5727 43.5754 18.5727C43.9712 18.5727 44.2891 18.2549 44.2891 17.8591V2.14093C44.2891 1.74513 43.9712 1.42729 43.5754 1.42729ZM42.1481 18.5727H26.43C26.0342 18.5727 25.7163 18.2549 25.7163 17.8591V2.14093C25.7163 1.74513 26.0342 1.42729 26.43 1.42729H42.1481C42.5439 1.42729 42.8618 1.74513 42.8618 2.14093V17.8591C42.8618 18.2549 42.5439 18.5727 42.1481 18.5727Z" fill="#DED8CD"></path><path d="M75.003 1.42729C74.6072 1.42729 74.2894 1.10945 74.2894 0.713643C74.2894 0.317841 73.9715 0 73.5757 0H63.5727C63.1769 0 62.8591 0.317841 62.8591 0.713643C62.8591 1.10945 62.5412 1.42729 62.1454 1.42729C61.7496 1.42729 61.4318 1.10945 61.4318 0.713643C61.4318 0.317841 61.1139 0 60.7181 0H49.2879C48.8921 0 48.5742 0.317841 48.5742 0.713643V19.2864C48.5742 19.6822 48.8921 20 49.2879 20C49.6837 20 50.0015 19.6822 50.0015 19.2864V2.14093C50.0015 1.74513 50.3193 1.42729 50.7151 1.42729H60.7181C61.1139 1.42729 61.4318 1.74513 61.4318 2.14093V19.2864C61.4318 19.6822 61.7496 20 62.1454 20C62.5412 20 62.8591 19.6822 62.8591 19.2864V2.14093C62.8591 1.74513 63.1769 1.42729 63.5727 1.42729H73.5757C73.9715 1.42729 74.2894 1.74513 74.2894 2.14093V19.2864C74.2894 19.6822 74.6072 20 75.003 20C75.3988 20 75.7166 19.6822 75.7166 19.2864V2.14093C75.7166 1.74513 75.3988 1.42729 75.003 1.42729Z" fill="#DED8CD"></path><path d="M123.581 0C123.185 0 122.868 0.317841 122.868 0.713643V8.56972C122.868 8.96552 122.55 9.28336 122.154 9.28336H107.155V6.42879C107.155 6.03298 106.832 5.71514 106.442 5.71514C106.052 5.71514 105.728 5.3913 105.728 5.0015V0.713643C105.728 0.317841 105.404 0 105.014 0C104.625 0 104.301 0.317841 104.301 0.713643V5.0015C104.301 5.3973 104.619 5.71514 105.014 5.71514C105.41 5.71514 105.728 6.03298 105.728 6.42879V10.003C105.728 10.3988 105.41 10.7166 105.014 10.7166C104.619 10.7166 104.301 11.0345 104.301 11.4303V19.2864C104.301 19.6822 104.619 20 105.014 20C105.41 20 105.728 19.6762 105.728 19.2864V11.4303C105.728 11.0345 106.046 10.7166 106.442 10.7166H121.44V13.5712C121.44 13.967 121.758 14.2849 122.154 14.2849C122.55 14.2849 122.868 14.6027 122.868 14.9985V19.2864C122.868 19.6822 123.185 20 123.581 20C123.977 20 124.295 19.6762 124.295 19.2864V14.9985C124.295 14.6027 123.971 14.2849 123.581 14.2849C123.191 14.2849 122.868 13.967 122.868 13.5712V9.997C122.868 9.6012 123.185 9.28336 123.581 9.28336C123.977 9.28336 124.295 8.96552 124.295 8.56972V0.713643C124.295 0.317841 123.971 0 123.581 0Z" fill="#D9613D"></path><path d="M147.861 1.42729C147.465 1.42729 147.147 1.10945 147.147 0.713643C147.147 0.317841 146.829 0 146.433 0H130.715C130.319 0 130.002 0.317841 130.002 0.713643C130.002 1.10945 129.684 1.42729 129.288 1.42729C128.892 1.42729 128.574 1.74513 128.574 2.14093V19.2864C128.574 19.6822 128.892 20 129.288 20C129.684 20 130.002 19.6762 130.002 19.2864V2.14093C130.002 1.74513 130.319 1.42729 130.715 1.42729H146.433C146.829 1.42729 147.147 1.74513 147.147 2.14093V17.8591C147.147 18.2549 146.829 18.5727 146.433 18.5727H137.864C137.468 18.5727 137.15 18.8906 137.15 19.2864C137.15 19.6822 137.468 20 137.864 20H146.433C146.829 20 147.147 19.6762 147.147 19.2864C147.147 18.8906 147.465 18.5727 147.861 18.5727C148.256 18.5727 148.574 18.2489 148.574 17.8591V2.14093C148.574 1.74513 148.256 1.42729 147.861 1.42729Z" fill="#D9613D"></path><path d="M173.583 1.42729C173.187 1.42729 172.869 1.10945 172.869 0.713643C172.869 0.317841 172.551 0 172.155 0H166.44C166.044 0 165.727 0.317841 165.727 0.713643C165.727 1.10945 166.044 1.42729 166.44 1.42729H172.155C172.551 1.42729 172.869 1.74513 172.869 2.14093V7.85607C172.869 8.25187 173.187 8.56972 173.583 8.56972C173.978 8.56972 174.296 8.25187 174.296 7.85607V2.14093C174.296 1.74513 173.978 1.42729 173.583 1.42729Z" fill="#D9613D"></path><path d="M160.727 1.42729C160.331 1.42729 160.014 1.10945 160.014 0.713643C160.014 0.317841 159.696 0 159.3 0H153.585C153.189 0 152.871 0.317841 152.871 0.713643C152.871 1.10945 153.195 1.42729 153.585 1.42729H159.3C159.696 1.42729 160.014 1.74513 160.014 2.14093V19.2864C160.014 19.6822 160.331 20 160.727 20C161.123 20 161.441 19.6762 161.441 19.2864V2.14093C161.441 1.74513 161.123 1.42729 160.727 1.42729Z" fill="#D9613D"></path></g><defs><clipPath id="clip0_2_277"><rect width="174.297" height="20" fill="white"></rect></clipPath></defs></svg></div>
+    <div class="ctext">
+      <div class="ceye">הצעה לעבודה משותפת</div>
+      <h1>כל מה שקורה<br>מסביב לשרטוט</h1>
+      <p class="clead">מיפוי הזדמנויות להטמעת AI בסטודיו, ודרך עבודה שנבנה יחד.</p>
+      <div class="cmeta">אוגוסט 2026 · יומא אדריכלים · חמי בן לביא</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · ABOUT -->
+<section class="slide about" data-act="us">
+  <div class="pad">
+
+    <div class="eyebrow"><span class="num">01</span> אודות</div>
+
+    <h1>מחבר בין טכנולוגיה<br>לדרך שבה אנשים עובדים.</h1>
+
+    <div class="idn">
+      <div class="nm">חמי בן לביא</div>
+      <div class="rl">Head of Product Operations<span class="dot">·</span>200Apps</div>
+    </div>
+
+    <div class="abody">
+      <div>
+        <p>
+          ב-200Apps אני עוסק במוצר ובתהליכי עבודה, במקום שבו צורך עסקי, אנשים
+          וטכנולוגיה נפגשים. העבודה שלי מתחילה בהבנת הבעיה - וממשיכה עד שהפתרון
+          הופך לחלק מהעבודה עצמה.
+        </p>
+        <p>
+          את אותה גישה אני מביא לסדנאות, לוובינרים ולהדרכות בתחום ה-AI: פחות
+          להתפעל ממה שהכלים יודעים לעשות, ויותר להבין איפה הם יכולים לשנות עבודה
+          אמיתית - בפרויקטים, במסמכים, בהחלטות ובתהליכים שחוזרים מדי יום.
+        </p>
+      </div>
+      <div class="stmt">
+        <div class="srule"></div>
+        <p>הדרכה טובה לא נגמרת ב״הבנתי״.<br>היא מתחילה כשמשהו בעבודה משתנה.</p>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="cap">נציגים מארגונים שהשתתפו בהדרכות ובסדנאות שלי</div>
+      <div class="lrow">
+        <span class="lg lg-nvidia"><img src="assets/logos/nvidia.png" alt="NVIDIA"></span>
+        <span class="lg lg-google"><img src="assets/logos/google.png" alt="Google"></span>
+        <span class="lg lg-monday"><img src="assets/logos/monday.png" alt="monday.com"></span>
+        <span class="lg lg-payoneer"><img src="assets/logos/payoneer.png" alt="Payoneer"></span>
+        <span class="lg lg-booking"><img src="assets/logos/booking.png" alt="Booking.com"></span>
+        <span class="lg lg-wix"><img src="assets/logos/wix.png" alt="Wix"></span>
+        <span class="lg lg-checkpoint"><img src="assets/logos/checkpoint.png" alt="Check Point"></span>
+        <span class="lg lg-paloalto"><img src="assets/logos/paloalto.png" alt="Palo Alto Networks"></span>
+      </div>
+      <div class="lrow">
+        <span class="lg lg-mobileye"><img src="assets/logos/mobileye.png" alt="Mobileye"></span>
+        <span class="lg lg-solaredge"><img src="assets/logos/solaredge.png" alt="SolarEdge"></span>
+        <span class="lg lg-taboola"><img src="assets/logos/taboola.png" alt="Taboola"></span>
+        <span class="lg lg-citi"><img src="assets/logos/citi.png" alt="Citi"></span>
+        <span class="lg lg-akamai"><img src="assets/logos/akamai.png" alt="Akamai"></span>
+        <span class="lg lg-philips"><img src="assets/logos/philips.png" alt="Philips"></span>
+        <span class="lg lg-unity"><img src="assets/logos/unity.png" alt="Unity"></span>
+        <span class="lg lg-elal"><img src="assets/logos/elal.png" alt="EL AL"></span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 2 · THE PROBLEM -->
+<section class="slide dark" data-act="them">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">02</span> הבעיה</div>
+    <h2>ללמוד AI זה החלק הקל.<br>להכניס אותו ליום העבודה - זה האתגר.</h2>
+    <div class="tracks">
+      <div class="trk a">
+        <div class="lbl">הדרכה</div>
+        <div class="flow">
+          <span class="stepx">לומדים</span><span class="arw">←</span>
+          <span class="stepx">מתנסים</span><span class="arw">←</span>
+          <span class="stepx">מתלהבים</span>
+          <span class="stop">וכאן זה נעצר</span>
+        </div>
+      </div>
+      <div class="trk b">
+        <div class="lbl">הטמעה</div>
+        <div class="flow">
+          <span class="stepx">משתמשים</span><span class="arw">←</span>
+          <span class="stepx">בודקים</span><span class="arw">←</span>
+          <span class="stepx">משפרים</span><span class="arw">←</span>
+          <span class="stepx habit">הופכים להרגל</span>
+        </div>
+      </div>
+    </div>
+    <div class="foot">לא לדעת יותר. <strong>לעבוד אחרת ביום שאחרי.</strong></div>
+  </div>
+</section>
+
+<!-- 3 · THREE LANES -->
+<section class="slide" data-act="them">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">03</span> מפת העבודה</div>
+    <h2>לפני ששואלים "מה AI יודע לעשות?"<br>צריך להבין "איך אתם עובדים היום?"</h2>
+    <div class="lanes">
+      <div class="lane">
+        <h3>הנהלה</h3><div class="rule"></div>
+        <ul><li>מכרזים</li><li>קבלת החלטות</li><li>ניתוח מידע</li><li>מעקב פרויקטים</li><li>בקרה</li></ul>
+      </div>
+      <div class="lane">
+        <h3>אדריכלות</h3><div class="rule"></div>
+        <ul><li>מחקר</li><li>חומרי פרויקט</li><li>חלופות תכנון</li><li>סיכומי פגישות</li><li>עבודה מול לקוח</li></ul>
+      </div>
+      <div class="lane">
+        <h3>אדמיניסטרציה</h3><div class="rule"></div>
+        <ul><li>תיאומים</li><li>מסמכים</li><li>מעקבים</li><li>תקשורת</li><li>ריכוז מידע</li></ul>
+      </div>
+    </div>
+    <div class="foot">אלה הכותרות, לא האבחנה. <strong>את המפה המדויקת נבנה יחד.</strong></div>
+  </div>
+</section>
+
+<!-- 4 · DISCOVERY -->
+<section class="slide dark" data-act="them">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">04</span> נקודת ההתחלה</div>
+    <h2>אנחנו לא מתחילים ממה ש-AI יודע לעשות.<br>אנחנו מתחילים ממה ששווה לשנות.</h2>
+    <div class="qwrap">
+      <div class="notes">
+        <div class="note" style="top:4%;right:0;transform:rotate(-1.4deg)">"הלוואי שמישהו היה מסכם את הישיבה הזאת"</div>
+        <div class="note" style="top:60%;right:3%;transform:rotate(1.1deg)">"הלוואי שמישהו היה עושה סדר בכל החומר של הפרויקט"</div>
+        <div class="note" style="top:2%;left:0;transform:rotate(1.6deg)">"הלוואי שמישהו היה עובר על המכרז ומוציא רק מה שרלוונטי לנו"</div>
+        <div class="note" style="top:62%;left:2%;transform:rotate(-1.2deg)">"הלוואי שמישהו היה מכין לי נקודת פתיחה לפני הפגישה עם הלקוח"</div>
+      </div>
+      <div class="qbox">
+        <div class="qmark">”</div>
+        <div class="big-q">הלוואי שמישהו היה עושה את זה בשבילי.</div>
+      </div>
+    </div>
+    <div class="rules3">
+      <span>שבוע אחד. בכל פעם שחושבים את זה, רושמים.</span>
+      <span>לא צריך לדעת אם אפשר לפתור את זה.</span>
+    </div>
+    <div class="foot">אתם מכירים את העבודה שלכם. <strong>תראו לי איפה היא מכאיבה.</strong></div>
+  </div>
+</section>
+
+<!-- 5 · CONTEXT -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">05</span> העיקרון המרכזי</div>
+    <h2>AI טוב לא מתחיל בפרומפט.<br>הוא מתחיל בקונטקסט.</h2>
+    <div class="vs">
+      <div class="vsc thin">
+        <div class="cap">שיחה ריקה</div>
+        <div class="bubble">תעזור לי עם פרויקט בן מימון</div>
+        <div class="reply">"בשמחה. על איזה פרויקט מדובר?"</div>
+        <div class="verdict" style="color:#8A8F91">לא יודע כלום. בכל פעם מחדש.</div>
+      </div>
+      <div class="vsc rich">
+        <div class="cap">סביבת עבודה שמכירה את הפרויקט</div>
+        <div class="bubble">תעזור לי עם פרויקט בן מימון</div>
+        <div class="reply" style="color:#5B6165;font-style:normal">"ראיתי שסבב התיקונים השני חזר מהוועדה עם שתי הערות שטרם נענו, ושתיאום הקונסטרוקטור מחכה שבועיים. במה נתחיל?"</div>
+        <div class="ctx">
+          <span>הלקוח</span><span>שלב הפרויקט</span><span>החלטות קודמות</span><span>סיכומי ישיבות</span>
+          <span>אילוצים</span><span>מסמכי מפתח</span><span>סטנדרטים של המשרד</span>
+        </div>
+        <div class="verdict">כבר בעולם אחר.</div>
+      </div>
+    </div>
+    <div class="foot">הפרומפט הוא החלק הקטן. <strong>ההקשר הוא העבודה.</strong></div>
+  </div>
+</section>
+
+<!-- 6 · PROJECT ENVIRONMENT -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">06</span> איך זה נראה בפועל</div>
+    <h2>במקום להתחיל כל פעם מחדש,<br>בונים ל-AI מקום בתוך העבודה.</h2>
+    <div class="two" style="grid-template-columns:1.45fr 1fr">
+      <div class="tree">
+        <div class="th">
+          <svg class="ico" style="width:19px;height:19px;stroke:var(--accent);stroke-width:1.6;fill:none" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <b>פרויקט: בן מימון</b><span class="tag">מודל לדוגמה</span>
+        </div>
+        <div class="tr key"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3v5h5M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/></svg>PROJECT.md<span class="note2">תקציר הפרויקט ומה חשוב לדעת</span></div>
+        <div class="tr"><svg class="ico" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>דרישות הלקוח</div>
+        <div class="tr"><svg class="ico" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>החלטות תכנון</div>
+        <div class="tr"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>סיכומי ישיבות</div>
+        <div class="tr"><svg class="ico" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/></svg>אילוצים ומגבלות</div>
+        <div class="tr"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3v5h5M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/></svg>מסמכי תכנון רלוונטיים</div>
+        <div class="tr"><svg class="ico" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>הצעות מחיר ותקציב</div>
+        <div class="tr key"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.6L5.8 21l2.4-7.4L2 9.4h7.6z"/></svg>סטנדרטים והנחיות של המשרד<span class="note2">משותף לכל הפרויקטים</span></div>
+      </div>
+      <div class="side">
+        <div class="sidec"><b>Projects</b><span>מרחב עבודה שיושב על התיקייה ומכיר אותה</span></div>
+        <div class="sidec"><b>Skills</b><span>נהלים כתובים שהמערכת מפעילה לבד כשהמשימה מתאימה</span></div>
+        <div class="sidec"><b>קבצי הנחיות</b><span>הכללים של המשרד, במקום אחד, בכתב</span></div>
+      </div>
+    </div>
+    <div class="foot">לא מעלים לשם את כל התיקייה. <strong>בוחרים מה המערכת צריכה לדעת.</strong></div>
+  </div>
+</section>
+
+<!-- 8 · WHERE TRAINING BECOMES ADOPTION -->
+<section class="slide dark" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">07</span> נקודת המפנה</div>
+    <h2>לומדים יחד. עובדים על שלכם.</h2>
+    <div class="desk">
+      <div class="screen">
+        <div class="st2"><b>בן מימון</b><span>תכנון להיתר · סבב תיקונים 2</span></div>
+        <div class="task">סיכום ישיבת התיאום עם הקונסטרוקטור, והוצאת המשימות שנפתחו</div>
+        <div class="body2"><i></i><i></i><i></i><i></i></div>
+        <div class="cursor">הקבצים שלכם, במחשב שלכם, על פרויקט שרץ עכשיו</div>
+      </div>
+      <div class="peers">
+        <div class="pscr"><b>רשב"א · בדיקת תב"ע</b><i></i><i></i></div>
+        <div class="pscr"><b>טלביה · תיק שימור</b><i></i><i></i></div>
+        <div class="pscr"><b>הנהלה · מכרז חדש</b><i></i><i></i></div>
+      </div>
+    </div>
+    <div class="seq">
+      <span>פרויקט אמיתי</span><span>משימה אמיתית</span><span>המחשב שלהם</span><span>משפרים יחד</span><span>דרך עבודה שנשארת</span>
+    </div>
+    <div class="foot">אני לא עושה את העבודה במקום הצוות. <strong>אנחנו בונים יחד דרך אחרת לעשות אותה.</strong></div>
+  </div>
+</section>
+
+<!-- 10 · WHAT STAYS -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">08</span> מה נשאר במשרד</div>
+    <h2>בסוף התהליך, היכולת צריכה להישאר במשרד.</h2>
+    <div class="block">
+      <div class="bhead"><b>מערכת העבודה של המשרד עם AI</b><span>נכסים שנצברים בדרך</span></div>
+      <div class="fields">
+        <div class="fld"><div class="fn">01</div>
+          <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <b>סביבות עבודה לפרויקטים</b><span>תיקייה מוכנה לכל פרויקט חדש</span></div>
+        <div class="fld"><div class="fn">02</div>
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg>
+          <b>Skills ותבניות</b><span>נהלים שרצים לבד</span></div>
+        <div class="fld"><div class="fn">03</div>
+          <svg viewBox="0 0 24 24"><path d="M14 3v5h5M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/></svg>
+          <b>קבצי Context והנחיות</b><span>מה שהמערכת צריכה לדעת עליכם</span></div>
+        <div class="fld"><div class="fn">04</div>
+          <svg viewBox="0 0 24 24"><path d="M4 17l5-5-5-5M12 19h8"/></svg>
+          <b>תהליכים ששופרו ונבדקו</b><span>לפני ואחרי, מתועד</span></div>
+        <div class="fld"><div class="fn">05</div>
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <b>כללי עבודה של המשרד</b><span>מה מותר, מה לא, ואיך עושים את זה נכון</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · HOW WE KNOW -->
+<section class="slide dark" data-act="close">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">09</span> מדידה</div>
+    <h2>הצלחה לא נמדדת בכמה אנשים פתחו Claude.</h2>
+    <div class="q4b">
+      <div class="qq"><i>01</i><p>מה לוקח פחות זמן?</p></div>
+      <div class="qq"><i>02</i><p>איזו עבודה חוזרת הצטמצמה?</p></div>
+      <div class="qq"><i>03</i><p>איפה איכות התוצר השתפרה?</p></div>
+      <div class="qq"><i>04</i><p>איזו דרך עבודה חדשה הפכה להרגל?</p></div>
+      <div class="under">נגדיר נקודת פתיחה. נבדוק שוב. נראה מה באמת השתנה.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · HOW WE START -->
+<section class="slide" data-act="close">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">10</span> איך מתחילים</div>
+    <h2>לא מתחילים מתוכנית מוכנה.<br>מתחילים מלהבין את המשרד.</h2>
+    <div class="stages">
+      <div class="stg solid"><div class="sn2">01</div><b>Discovery</b>
+        <span>איך עובדים היום, איפה נתקעים, ומה כבר ניסיתם</span></div>
+      <div class="stg line"><div class="sn2">02</div><b>מפת הזדמנויות</b>
+        <span>איפה AI באמת יכול לייצר ערך</span></div>
+      <div class="stg ghost"><div class="sn2">03</div><b>תוכנית עבודה</b>
+        <span>הדרכות, הטמעה ומדידה</span></div>
+    </div>
+    <div class="next"><span class="nl">הצעד הבא</span><b>Discovery קצר עם הנהלה, אדריכלות ואדמיניסטרציה.</b></div>
+  </div>
+</section>
+
+<!-- 12 · THANKS -->
+<section class="slide dark" data-act="close">
+  <div class="pad">
+    <div class="thanks">
+      <div class="rule2"></div>
+      <div class="big">לא צריך לדעת היום את כל התשובות.<br>צריך לדעת איפה להתחיל.</div>
+      <div class="close2">משם כבר בונים את הדרך.</div>
+      <div class="sig">
+        <b>חמי בן לביא</b><br>
+        054-460-8119 · hemibenlavi@gmail.com
+      </div>
+      <svg class="ylogo ylogo2" xmlns="http://www.w3.org/2000/svg" width="175" height="20" viewBox="0 0 175 20" fill="none"><g clip-path="url(#clip0_2_277)"><path d="M19.2864 0C18.8906 0 18.5727 0.317841 18.5727 0.713643V8.56972C18.5727 8.96552 18.2549 9.28336 17.8591 9.28336H2.14093C1.74513 9.28336 1.42729 8.96552 1.42729 8.56972V0.713643C1.42729 0.317841 1.10945 0 0.713643 0C0.317841 0 0 0.317841 0 0.713643V8.56972C0 8.96552 0.317841 9.28336 0.713643 9.28336C1.10945 9.28336 1.42729 9.6012 1.42729 9.997C1.42729 10.3928 1.74513 10.7106 2.14093 10.7106H8.56972C8.96552 10.7106 9.28336 11.0285 9.28336 11.4243V19.2804C9.28336 19.6762 9.6012 19.994 9.997 19.994C10.3928 19.994 10.7106 19.6762 10.7106 19.2804V11.4243C10.7106 11.0285 11.0285 10.7106 11.4243 10.7106H17.8531C18.2489 10.7106 18.5667 10.3928 18.5667 9.997C18.5667 9.6012 18.8846 9.28336 19.2804 9.28336C19.6762 9.28336 19.994 8.96552 19.994 8.56972V0.713643C19.994 0.317841 19.6762 0 19.2804 0H19.2864Z" fill="#DED8CD"></path><path d="M99.2942 1.42729C98.8984 1.42729 98.5805 1.10945 98.5805 0.713643C98.5805 0.317841 98.2567 0 97.8669 0H82.1487C81.7529 0 81.4351 0.317841 81.4351 0.713643C81.4351 1.10945 81.1173 1.42729 80.7215 1.42729C80.3257 1.42729 80.0078 1.74513 80.0078 2.14093V19.2864C80.0078 19.6822 80.3257 20 80.7215 20C81.1173 20 81.4351 19.6822 81.4351 19.2864V11.4243C81.4351 11.0285 81.7529 10.7106 82.1487 10.7106H97.8669C98.2627 10.7106 98.5805 11.0285 98.5805 11.4243V19.2864C98.5805 19.6822 98.8984 20 99.2942 20C99.69 20 100.008 19.6822 100.008 19.2864V2.14093C100.008 1.74513 99.684 1.42729 99.2942 1.42729ZM82.1487 9.28936C81.7529 9.28936 81.4351 8.97151 81.4351 8.57571V2.14093C81.4351 1.74513 81.7529 1.42729 82.1487 1.42729H97.8669C98.2627 1.42729 98.5805 1.74513 98.5805 2.14093V8.56972C98.5805 8.96552 98.2567 9.28336 97.8669 9.28336H82.1487V9.28936Z" fill="#DED8CD"></path><path d="M43.5754 1.42729C43.1796 1.42729 42.8618 1.10945 42.8618 0.713643C42.8618 0.317841 42.5439 0 42.1481 0H26.43C26.0342 0 25.7163 0.317841 25.7163 0.713643C25.7163 1.10945 25.3985 1.42729 25.0027 1.42729C24.6069 1.42729 24.2891 1.74513 24.2891 2.14093V17.8591C24.2891 18.2549 24.6069 18.5727 25.0027 18.5727C25.3985 18.5727 25.7163 18.8906 25.7163 19.2864C25.7163 19.6822 26.0342 20 26.43 20H42.1481C42.5439 20 42.8618 19.6822 42.8618 19.2864C42.8618 18.8906 43.1796 18.5727 43.5754 18.5727C43.9712 18.5727 44.2891 18.2549 44.2891 17.8591V2.14093C44.2891 1.74513 43.9712 1.42729 43.5754 1.42729ZM42.1481 18.5727H26.43C26.0342 18.5727 25.7163 18.2549 25.7163 17.8591V2.14093C25.7163 1.74513 26.0342 1.42729 26.43 1.42729H42.1481C42.5439 1.42729 42.8618 1.74513 42.8618 2.14093V17.8591C42.8618 18.2549 42.5439 18.5727 42.1481 18.5727Z" fill="#DED8CD"></path><path d="M75.003 1.42729C74.6072 1.42729 74.2894 1.10945 74.2894 0.713643C74.2894 0.317841 73.9715 0 73.5757 0H63.5727C63.1769 0 62.8591 0.317841 62.8591 0.713643C62.8591 1.10945 62.5412 1.42729 62.1454 1.42729C61.7496 1.42729 61.4318 1.10945 61.4318 0.713643C61.4318 0.317841 61.1139 0 60.7181 0H49.2879C48.8921 0 48.5742 0.317841 48.5742 0.713643V19.2864C48.5742 19.6822 48.8921 20 49.2879 20C49.6837 20 50.0015 19.6822 50.0015 19.2864V2.14093C50.0015 1.74513 50.3193 1.42729 50.7151 1.42729H60.7181C61.1139 1.42729 61.4318 1.74513 61.4318 2.14093V19.2864C61.4318 19.6822 61.7496 20 62.1454 20C62.5412 20 62.8591 19.6822 62.8591 19.2864V2.14093C62.8591 1.74513 63.1769 1.42729 63.5727 1.42729H73.5757C73.9715 1.42729 74.2894 1.74513 74.2894 2.14093V19.2864C74.2894 19.6822 74.6072 20 75.003 20C75.3988 20 75.7166 19.6822 75.7166 19.2864V2.14093C75.7166 1.74513 75.3988 1.42729 75.003 1.42729Z" fill="#DED8CD"></path><path d="M123.581 0C123.185 0 122.868 0.317841 122.868 0.713643V8.56972C122.868 8.96552 122.55 9.28336 122.154 9.28336H107.155V6.42879C107.155 6.03298 106.832 5.71514 106.442 5.71514C106.052 5.71514 105.728 5.3913 105.728 5.0015V0.713643C105.728 0.317841 105.404 0 105.014 0C104.625 0 104.301 0.317841 104.301 0.713643V5.0015C104.301 5.3973 104.619 5.71514 105.014 5.71514C105.41 5.71514 105.728 6.03298 105.728 6.42879V10.003C105.728 10.3988 105.41 10.7166 105.014 10.7166C104.619 10.7166 104.301 11.0345 104.301 11.4303V19.2864C104.301 19.6822 104.619 20 105.014 20C105.41 20 105.728 19.6762 105.728 19.2864V11.4303C105.728 11.0345 106.046 10.7166 106.442 10.7166H121.44V13.5712C121.44 13.967 121.758 14.2849 122.154 14.2849C122.55 14.2849 122.868 14.6027 122.868 14.9985V19.2864C122.868 19.6822 123.185 20 123.581 20C123.977 20 124.295 19.6762 124.295 19.2864V14.9985C124.295 14.6027 123.971 14.2849 123.581 14.2849C123.191 14.2849 122.868 13.967 122.868 13.5712V9.997C122.868 9.6012 123.185 9.28336 123.581 9.28336C123.977 9.28336 124.295 8.96552 124.295 8.56972V0.713643C124.295 0.317841 123.971 0 123.581 0Z" fill="#D9613D"></path><path d="M147.861 1.42729C147.465 1.42729 147.147 1.10945 147.147 0.713643C147.147 0.317841 146.829 0 146.433 0H130.715C130.319 0 130.002 0.317841 130.002 0.713643C130.002 1.10945 129.684 1.42729 129.288 1.42729C128.892 1.42729 128.574 1.74513 128.574 2.14093V19.2864C128.574 19.6822 128.892 20 129.288 20C129.684 20 130.002 19.6762 130.002 19.2864V2.14093C130.002 1.74513 130.319 1.42729 130.715 1.42729H146.433C146.829 1.42729 147.147 1.74513 147.147 2.14093V17.8591C147.147 18.2549 146.829 18.5727 146.433 18.5727H137.864C137.468 18.5727 137.15 18.8906 137.15 19.2864C137.15 19.6822 137.468 20 137.864 20H146.433C146.829 20 147.147 19.6762 147.147 19.2864C147.147 18.8906 147.465 18.5727 147.861 18.5727C148.256 18.5727 148.574 18.2489 148.574 17.8591V2.14093C148.574 1.74513 148.256 1.42729 147.861 1.42729Z" fill="#D9613D"></path><path d="M173.583 1.42729C173.187 1.42729 172.869 1.10945 172.869 0.713643C172.869 0.317841 172.551 0 172.155 0H166.44C166.044 0 165.727 0.317841 165.727 0.713643C165.727 1.10945 166.044 1.42729 166.44 1.42729H172.155C172.551 1.42729 172.869 1.74513 172.869 2.14093V7.85607C172.869 8.25187 173.187 8.56972 173.583 8.56972C173.978 8.56972 174.296 8.25187 174.296 7.85607V2.14093C174.296 1.74513 173.978 1.42729 173.583 1.42729Z" fill="#D9613D"></path><path d="M160.727 1.42729C160.331 1.42729 160.014 1.10945 160.014 0.713643C160.014 0.317841 159.696 0 159.3 0H153.585C153.189 0 152.871 0.317841 152.871 0.713643C152.871 1.10945 153.195 1.42729 153.585 1.42729H159.3C159.696 1.42729 160.014 1.74513 160.014 2.14093V19.2864C160.014 19.6822 160.331 20 160.727 20C161.123 20 161.441 19.6762 161.441 19.2864V2.14093C161.441 1.74513 161.123 1.42729 160.727 1.42729Z" fill="#D9613D"></path></g><defs><clipPath id="clip0_2_277"><rect width="174.297" height="20" fill="white"></rect></clipPath></defs></svg>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · APPENDIX DIVIDER -->
+<section class="slide dark" data-act="close">
+  <div class="pad">
+    <div class="divider">
+      <div class="dl2">נספח</div>
+      <div class="dt">דוגמאות, אם תרצו</div>
+      <div class="ds2">שלוש דוגמאות כדי לדמיין לאן תהליך כזה יכול להגיע.<br>לא הנחה שזה מה שאתם צריכים.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · FLAGSHIP 01 -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">נספח</span> הנהלה · המחשה בלבד</div>
+    <div class="two">
+      <div>
+        <h2>לדעת איפה כל היתר עומד,<br>בלי לרדוף אחרי המידע.</h2>
+        <div class="subname">דשבורד היתרים</div>
+        <div class="dl">
+          <div class="r"><div class="k">נכנס</div><div class="v">גיליון המשימות שכבר קיים אצלכם, מיילים, ותיקיות הפרויקטים.</div></div>
+          <div class="r"><div class="k">יוצא</div><div class="v">תמונת מצב עדכנית: איפה כל פרויקט עומד בשלבי הרישוי, מה תקוע ואצל מי, ומה מתקרב לתאריך.</div></div>
+          <div class="r"><div class="k">מי משתמש</div><div class="v">השותפים, פעם ביום. מנהלת המשרד, לעדכון.</div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh"><i></i><i></i><i></i><span class="mt">דשבורד רישוי</span><span class="demo">נתוני דוגמה</span></div>
+        <div class="mstrip">
+          <div><div class="v">12</div><div class="k">פרויקטים פעילים</div></div>
+          <div class="alert"><div class="v">3</div><div class="k">דורשים טיפול</div></div>
+          <div><div class="v">28</div><div class="k">ימי המתנה, ממוצע</div></div>
+        </div>
+        <div class="mrow hot"><div class="pj">רשב"א<span class="sub">מוקדם · ממתין לתיק מידע</span></div><span class="mbar hot"><i style="width:22%"></i></span><span class="chip w">14 יום</span></div>
+        <div class="mrow hot"><div class="pj">שרובר<span class="sub">היתר · אצל הוועדה</span></div><span class="mbar hot"><i style="width:64%"></i></span><span class="chip w">9 יום</span></div>
+        <div class="mrow"><div class="pj">בן מימון<span class="sub">היתר · סבב תיקונים 2</span></div><span class="mbar"><i style="width:78%"></i></span><span class="chip o">קונסטרוקטור</span></div>
+        <div class="mrow"><div class="pj">טלביה<span class="sub">היתר · ועדת שימור</span></div><span class="mbar"><i style="width:45%"></i></span><span class="chip o">שימור</span></div>
+        <div class="mrow ok"><div class="pj">גבעת יערים<span class="sub">ביצוע</span></div><span class="mbar"><i style="width:100%;background:#7FA98F"></i></span><span class="chip d">הושלם</span></div>
+        <div style="margin-top:auto;padding-top:12px;border-top:1px solid #E7EAEB;font-size:11.5px;color:#9AA0A3">
+          מתעדכן מהגיליון, מהמיילים ומתיקיות הפרויקטים
+        </div>
+      </div>
+    </div>
+    <div class="foot">נבנה ממה שכבר קיים אצלכם.</div>
+  </div>
+</section>
+
+<!-- 6 · FLAGSHIP 02 -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">נספח</span> אדריכלות · המחשה בלבד</div>
+    <div class="two">
+      <div>
+        <h2>שינוי אחד בתכנון,<br>עדכון אחד ברשימה.</h2>
+        <div class="subname">מחולל ובקר רשימות</div>
+        <div class="dl">
+          <div class="r"><div class="k">נכנס</div><div class="v">ייצוא Schedule מ-Revit, או טבלת אלמנטים מקאד.</div></div>
+          <div class="r"><div class="k">יוצא</div><div class="v">הרשימה בפורמט של המשרד, <strong>ודוח חריגות</strong>: סימון שקיים בתוכנית ולא ברשימה, אי-התאמה במידות, וחריגות שדורשות בדיקה.</div></div>
+          <div class="r"><div class="k">מי משתמש</div><div class="v">אדריכל הפרויקט, בכל סבב שינויים.</div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh"><i></i><i></i><i></i><span class="mt">רשימת נגרות · בן מימון</span><span class="demo">נתוני דוגמה</span></div>
+        <table class="mtab">
+          <thead><tr><th>סימון</th><th>כמות</th><th>רוחב</th><th>גובה</th><th>חומר</th></tr></thead>
+          <tbody>
+            <tr><td><span class="mk">ד-1</span></td><td>12</td><td>90</td><td>210</td><td>עץ, לבן</td></tr>
+            <tr><td><span class="mk">ד-2</span></td><td>4</td><td>80</td><td>210</td><td>עץ, לבן</td></tr>
+            <tr class="flag-row"><td><span class="mk">ח-3</span></td><td>8</td><td>120</td><td>140</td><td>אלומיניום</td></tr>
+            <tr><td><span class="mk">ד-3</span></td><td>6</td><td>70</td><td>210</td><td>עץ, לבן</td></tr>
+            <tr><td><span class="mk">ח-1</span></td><td>14</td><td>90</td><td>160</td><td>אלומיניום</td></tr>
+            <tr><td><span class="mk">מ-1</span></td><td>1</td><td>100</td><td>210</td><td>פלדה, ת"י</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:auto;padding-top:12px;border-top:1px solid #E7EAEB;font-size:12px;line-height:1.5;color:#1A2129">
+          <strong>חריגה:</strong> ח-3 מסומן בתוכנית ברוחב 130 וברשימה 120.
+        </div>
+      </div>
+    </div>
+    <div class="foot">היום מעדכנים בשני מקומות. <strong>כאן פעם אחת.</strong></div>
+  </div>
+</section>
+
+<!-- 17 · APPENDIX 3 · ADMIN -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">נספח</span> אדמיניסטרציה · המחשה בלבד</div>
+    <div class="two">
+      <div>
+        <h2>מה הוחלט, מי אחראי,<br>ומה עדיין פתוח.</h2>
+        <div class="subname">מעקב החלטות ותיאומים</div>
+        <div class="dl">
+          <div class="r"><div class="k">נכנס</div><div class="v">סיכום ישיבה, מייל, או רשימת משימות.</div></div>
+          <div class="r"><div class="k">יוצא</div><div class="v">מה הוחלט, מי אחראי, מה עדיין פתוח, מה מחכה לתשובה, ומה דורש מעקב.</div></div>
+          <div class="r"><div class="k">מי משתמש</div><div class="v">מנהלת המשרד, ומנהל הפרויקט.</div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh"><i></i><i></i><i></i><span class="mt">ישיבת תיאום · בן מימון · 12.6</span><span class="demo">נתוני דוגמה</span></div>
+        <div class="mrow hot"><div class="pj">עובי קיר חוץ יורד ל-25 ס"מ<span class="sub">הוחלט · דורש עדכון ברשימות</span></div><span class="chip w">אדריכל</span></div>
+        <div class="mrow"><div class="pj">מיקום פיר מיזוג בקומה 3<span class="sub">פתוח · ממתין ליועץ מיזוג</span></div><span class="chip o">ממתין</span></div>
+        <div class="mrow ok"><div class="pj">גובה מעקה במרפסות<span class="sub">נסגר · לפי התקן</span></div><span class="chip d">נסגר</span></div>
+        <div class="mrow hot"><div class="pj">תיאום חשמל מול הקונסטרוקטור<span class="sub">פתוח · אין תשובה 9 ימים</span></div><span class="chip w">מעקב</span></div>
+        <div class="mrow"><div class="pj">אישור דגם משרביה<span class="sub">ממתין לתשובת לקוח</span></div><span class="chip o">לקוח</span></div>
+        <div style="margin-top:auto;padding-top:12px;border-top:1px solid #E7EAEB;font-size:11.5px;color:#9DA5AA">
+          5 סעיפים · 3 פתוחים · 1 ללא מענה מעל שבוע
+        </div>
+      </div>
+    </div>
+    <div class="foot">הישיבה נגמרה. <strong>המעקב כבר התחיל.</strong></div>
+  </div>
+</section>
+
+<!-- 7 · WHAT WE LEARN -->
+<section class="slide" data-act="product">
+  <div class="pad">
+    <div class="eyebrow"><span class="num">נספח</span> ומה בעצם לומדים</div>
+    <h2>לא מלמדים פיצ'רים.<br>בונים יכולת לעבוד.</h2>
+    <div class="ladder">
+      <div class="rung"><div class="n2">01</div><b>להבין</b><span>איפה הוא חזק, ואיפה לא</span></div>
+      <div class="rung"><div class="n2">02</div><b>לתת הקשר</b><span>מה המערכת צריכה לדעת עליכם</span></div>
+      <div class="rung"><div class="n2">03</div><b>לעבוד</b><span>על חומרים אמיתיים</span></div>
+      <div class="rung"><div class="n2">04</div><b>לבנות</b><span>סביבות ותהליכים חוזרים</span></div>
+      <div class="rung"><div class="n2">05</div><b>להטמיע</b><span>עד שזה הופך להרגל</span></div>
+    </div>
+    <div class="foot">הפיצ'רים משתנים כל הזמן. <strong>דרך העבודה נשארת.</strong></div>
+  </div>
+</section>
+
+</div></div>
+
+<div id="chrome"><div id="bar"></div><span id="cnt"></span></div>
+
+<script>
+var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,
+    stage=document.getElementById('stage'),bar=document.getElementById('bar'),cnt=document.getElementById('cnt');
+function fit(){var s=Math.min(innerWidth/1280,innerHeight/720)*0.965;stage.style.transform='scale('+s+')'}
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+  bar.style.width=(((i+1)/slides.length)*100)+'%';
+  cnt.textContent=(i+1)+' / '+slides.length;
+  if(history.replaceState)history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);
+addEventListener('keydown',function(e){
+  if(e.key==='ArrowLeft'||e.key===' '||e.key==='PageDown')go(i+1);
+  else if(e.key==='ArrowRight'||e.key==='PageUp')go(i-1);
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}});
+(function(){
+  var orb=document.querySelector('.orb'); if(!orb)return;
+  var sats=[].slice.call(orb.querySelectorAll('.sat')), k=0, t=null, hov=false;
+  orb.addEventListener('mouseenter',function(){hov=true;sats.forEach(function(x){x.classList.remove('live')})});
+  orb.addEventListener('mouseleave',function(){hov=false});
+  function tick(){ if(hov)return;
+    sats.forEach(function(x){x.classList.remove('live')});
+    sats[k%sats.length].classList.add('live'); k++}
+  function watch(){
+    var on=orb.closest('.slide').classList.contains('on');
+    if(on&&!t){k=0;tick();t=setInterval(tick,1900)}
+    else if(!on&&t){clearInterval(t);t=null;sats.forEach(function(x){x.classList.remove('live')})}}
+  new MutationObserver(watch).observe(orb.closest('.slide'),{attributes:true,attributeFilter:['class']});
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches)watch();
+})();
+fit();go((parseInt((location.hash||'').replace('#',''),10)||1)-1);
+setTimeout(function(){var h=document.getElementById('hint');if(h)h.style.opacity=0},4200);
+</script>
+
+</body>
+</html>
