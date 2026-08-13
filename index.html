@@ -27,7 +27,8 @@
 html,body{height:100%;background:#0E1720;overflow:hidden}
 body{font-family:Deck,'Assistant','Heebo',Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
 
-#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#viewport{position:fixed;top:0;left:0;right:0;bottom:0;height:100vh;height:100dvh;
+  display:grid;place-items:center;overflow:hidden}
 #stage{width:1280px;height:720px;position:relative;transform-origin:center center;
   box-shadow:0 30px 90px rgba(0,0,0,.5)}
 .slide{position:absolute;inset:0;background:var(--bg);opacity:0;pointer-events:none;
@@ -1134,13 +1135,21 @@ b,strong{font-weight:600;color:var(--ink)}
 <script>
 var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,
     stage=document.getElementById('stage'),bar=document.getElementById('bar'),cnt=document.getElementById('cnt');
-function fit(){var s=Math.min(innerWidth/1280,innerHeight/720)*0.965;stage.style.transform='scale('+s+')'}
+function fit(){
+  var vv=window.visualViewport,
+      w=vv?vv.width:innerWidth, h=vv?vv.height:innerHeight,
+      s=Math.min(w/1280,h/720)*0.965;
+  stage.style.transform='scale('+s+')';
+}
 function go(n){i=Math.max(0,Math.min(slides.length-1,n));
   slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
   bar.style.width=(((i+1)/slides.length)*100)+'%';
   cnt.textContent=(i+1)+' / '+slides.length;
   if(history.replaceState)history.replaceState(null,'','#'+(i+1))}
 addEventListener('resize',fit);
+addEventListener('orientationchange',function(){setTimeout(fit,120)});
+if(window.visualViewport){visualViewport.addEventListener('resize',fit);visualViewport.addEventListener('scroll',fit)}
+
 addEventListener('keydown',function(e){
   if(e.key==='ArrowLeft'||e.key===' '||e.key==='PageDown')go(i+1);
   else if(e.key==='ArrowRight'||e.key==='PageUp')go(i-1);
